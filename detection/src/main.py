@@ -1,11 +1,10 @@
 """
-Main entry point for M1 Vehicle Detection Server
-Author: Alims-Repo
-Date: 2025-06-17
+    Main entry point for M1 Vehicle Detection Server
+    Author: Alims-Repo
+    Date: 2025-06-17
 """
 
 import sys
-import os
 from pathlib import Path
 
 # Add project root to Python path
@@ -14,7 +13,6 @@ sys.path.insert(0, str(project_root))
 
 from src.utils.logging_config import setup_logging
 from src.server.app import VehicleDetectionServer
-
 
 def main():
     """Main entry point"""

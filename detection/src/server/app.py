@@ -1,7 +1,7 @@
 """
-Updated main application server with enhanced controls
-Author: Alims-Repo
-Date: 2025-06-17
+    Updated main application server with enhanced controls
+    Author: Alims-Repo
+    Date: 2025-06-17
 """
 
 import json
@@ -21,37 +21,36 @@ from src.server.enhanced_handlers import EnhancedHTTPHandlers  # Import enhanced
 config = get_config()
 logger = get_logger("app")
 
-
 class VehicleDetectionServer:
     """Main server application with enhanced controls"""
-    
+
     def __init__(self):
         self.app = web.Application()
         self.broadcaster: Optional[VideoBroadcaster] = None
         self.detector: Optional[VehicleDetector] = None
         self.model = None
         self.device = None
-        
+
         # Handlers
         self.ws_handlers: Optional[WebSocketHandlers] = None
         self.http_handlers: Optional[HTTPHandlers] = None
         self.enhanced_handlers: Optional[EnhancedHTTPHandlers] = None  # Add enhanced handlers
-        
+
         self._setup_routes()
         self._setup_middleware()
-    
+
     def _setup_routes(self):
         """Setup web routes"""
         # WebSocket endpoint
         self.app.router.add_get("/ws", self.websocket_handler)
-        
+
         # HTTP endpoints - will be configured after handlers are created
         self.app.on_startup.append(self._setup_http_routes)
-        
+
         # Lifecycle hooks
         self.app.on_startup.append(self.on_startup)
         self.app.on_shutdown.append(self.on_shutdown)
-    
+
     async def _setup_http_routes(self, app):
         """Setup HTTP routes after handlers are initialized"""
         if self.http_handlers:
@@ -76,10 +75,10 @@ class VehicleDetectionServer:
             self.app.router.add_get("/clients", self.enhanced_handlers.get_client_management)
 
             logger.info("✅ Enhanced control endpoints registered")
-    
+
     def _setup_middleware(self):
         """Setup middleware for CORS, logging, etc."""
-        
+
         @web.middleware
         async def cors_handler(request, handler):
             """CORS middleware"""
@@ -88,7 +87,7 @@ class VehicleDetectionServer:
             response.headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS'
             response.headers['Access-Control-Allow-Headers'] = 'Content-Type'
             return response
-        
+
         @web.middleware
         async def error_handler(request, handler):
             """Error handling middleware"""
@@ -102,7 +101,7 @@ class VehicleDetectionServer:
                     {"error": str(e), "path": request.path, "method": request.method},
                     status=500
                 )
-        
+
         @web.middleware
         async def logging_middleware(request, handler):
             """Request logging middleware"""
@@ -114,7 +113,7 @@ class VehicleDetectionServer:
         self.app.middlewares.append(cors_handler)
         self.app.middlewares.append(logging_middleware)
         self.app.middlewares.append(error_handler)
-    
+
     async def websocket_handler(self, request) -> web.WebSocketResponse:
         """Handle WebSocket connections"""
         ws = web.WebSocketResponse(
@@ -122,13 +121,13 @@ class VehicleDetectionServer:
             timeout=config.WS_TIMEOUT
         )
         await ws.prepare(request)
-        
+
         # Add client to broadcaster
         if self.broadcaster:
             self.broadcaster.add_client(ws)
-        
+
         logger.info(f"🔌 WebSocket connected from {request.remote}")
-        
+
         try:
             async for msg in ws:
                 if msg.type == aiohttp.WSMsgType.TEXT:
@@ -136,7 +135,7 @@ class VehicleDetectionServer:
                 elif msg.type == aiohttp.WSMsgType.ERROR:
                     logger.error(f"🚨 WebSocket error: {ws.exception()}")
                     break
-                
+
         except Exception as e:
             logger.error(f"🚨 WebSocket handler error: {e}")
             if config.DEBUG:
@@ -146,21 +145,21 @@ class VehicleDetectionServer:
             if self.broadcaster:
                 self.broadcaster.remove_client(ws)
             logger.info(f"🔌 WebSocket disconnected from {request.remote}")
-        
+
         return ws
-    
+
     async def _handle_websocket_message(self, ws: web.WebSocketResponse, data: str):
         """Handle incoming WebSocket messages"""
         try:
             message = json.loads(data)
             command = message.get("command")
-            
+
             logger.info(f"📨 WebSocket command: {command}")
 
             if not self.ws_handlers:
                 await ws.send_json({"error": "Server not ready"})
                 return
-            
+
             # Route command to appropriate handler
             handler_map = {
                 "get_stats": self.ws_handlers.handle_get_stats,
@@ -168,7 +167,7 @@ class VehicleDetectionServer:
                 "reset_stats": self.ws_handlers.handle_reset_stats,
                 "get_clients": self.ws_handlers.handle_get_clients
             }
-            
+
             handler = handler_map.get(command)
             if handler:
                 response = await handler(ws)
@@ -178,45 +177,45 @@ class VehicleDetectionServer:
                     "error": f"Unknown command: {command}",
                     "available_commands": list(handler_map.keys())
                 })
-                
+
         except json.JSONDecodeError:
             await ws.send_json({"error": "Invalid JSON message"})
         except Exception as e:
             logger.error(f"❌ WebSocket message error: {e}")
             await ws.send_json({"error": str(e)})
-    
+
     async def on_startup(self, app):
         """Application startup"""
         logger.info("🚀 Starting M1 Pro Vehicle Detection Server...")
         logger.info(f"📁 Video path: {config.VIDEO_PATH}")
         logger.info(f"🎯 Target FPS: {config.TARGET_FPS}")
         logger.info(f"🔧 Debug mode: {config.DEBUG}")
-        
+
         # Check video file
         if not config.VIDEO_PATH.exists():
             logger.error(f"❌ Video file not found: {config.VIDEO_PATH}")
             logger.info("💡 Place your video file at: resources/1.mp4")
             return
-        
+
         try:
             # Initialize model and device
             logger.info("🧠 Initializing AI model...")
             self.model, self.device = DeviceOptimizer.find_optimal_config()
-            
+
             # Initialize detector
             logger.info("🔍 Setting up vehicle detector...")
             self.detector = VehicleDetector(self.model, self.device)
-            
+
             # Initialize broadcaster
             logger.info("📡 Starting video broadcaster...")
             self.broadcaster = VideoBroadcaster(config.VIDEO_PATH, self.detector, self.device)
             self.broadcaster.start()
-            
+
             # Initialize handlers
             self.ws_handlers = WebSocketHandlers(self.broadcaster, self.detector, self.device)
             self.http_handlers = HTTPHandlers(self.broadcaster, self.detector, self.device)
             self.enhanced_handlers = EnhancedHTTPHandlers(self.broadcaster, self.detector, self.device)
-            
+
             logger.info("✅ Server startup complete!")
             logger.info(f"🌐 Access the server at: http://{config.HOST}:{config.PORT}")
             logger.info(f"🔗 WebSocket endpoint: ws://{config.HOST}:{config.PORT}/ws")
@@ -227,39 +226,39 @@ class VehicleDetectionServer:
             logger.info("   • POST /control/broadcast - Broadcasting control")
             logger.info("   • POST /control/device - Device switching")
             logger.info("   • POST /config - Configuration updates")
-            
+
         except Exception as e:
             logger.error(f"❌ Startup failed: {e}")
             if config.DEBUG:
                 traceback.print_exc()
             raise
-    
+
     async def on_shutdown(self, app):
         """Application shutdown"""
         logger.info("🛑 Shutting down server...")
-        
+
         try:
             if self.broadcaster:
                 await self.broadcaster.stop()
-            
+
             logger.info("✅ Server shutdown complete")
         except Exception as e:
             logger.error(f"❌ Shutdown error: {e}")
-    
+
     def run(self):
         """Run the server"""
-        logger.info("🌟 M1 Pro Vehicle Detection Server")
+        logger.info("🌟 Vehicle Detection Server")
         logger.info("=" * 50)
         logger.info(f"📍 URL: http://{config.HOST}:{config.PORT}")
         logger.info(f"🎯 Vehicle Classes: {', '.join(config.VEHICLE_CLASSES)}")
         logger.info(f"🔧 Configuration: {config.__class__.__name__}")
         logger.info("=" * 50)
-        
+
         web.run_app(
-            self.app, 
-            host=config.HOST, 
-            port=config.PORT,
-            access_log=logger if config.DEBUG else None
+            self.app,
+            host = config.HOST,
+            port = config.PORT,
+            access_log = logger if config.DEBUG else None
         )
 
 

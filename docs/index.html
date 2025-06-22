@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Smart Traffic Management System - AI-Powered Traffic Control</title>
+    <meta name="description" content="Revolutionary AI-powered traffic management system with real-time monitoring, predictive analytics, and automated signal control for smart cities." />
+    <meta name="keywords" content="traffic management, AI, smart city, traffic control, Jetpack Compose, Android, Kotlin" />
+    <link rel="stylesheet" href="assets/css/style.css" />
+    <link rel="stylesheet" href="assets/css/components.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="assets/images/favicon.png">
+</head>
+<body>
+<!-- Navigation -->
+<nav class="navbar">
+    <div class="nav-container">
+        <div class="nav-brand">
+            <img src="assets/images/logo.svg" alt="Smart Traffic Management" class="logo-img">
+            <span class="brand-text">Smart Traffic Management</span>
+        </div>
+        <div class="nav-menu" id="nav-menu">
+            <a href="index.html" class="nav-link active">Home</a>
+            <a href="features.html" class="nav-link">Features</a>
+            <a href="demo.html" class="nav-link">Live Demo</a>
+            <a href="documentation.html" class="nav-link">Documentation</a>
+            <a href="analytics.html" class="nav-link">Analytics</a>
+            <a href="about.html" class="nav-link">About</a>
+            <a href="contact.html" class="nav-link">Contact</a>
+            <a href="https://github.com/Alims-Repo/Smart-Traffic-Management-System" class="nav-link github-link" target="_blank">
+                <i class="icon-github"></i> GitHub
+            </a>
+        </div>
+        <div class="nav-toggle" id="nav-toggle">
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+        </div>
+    </div>
+</nav>
+
+<!-- Hero Section -->
+<section class="hero">
+    <div class="hero-background">
+        <div class="traffic-animation">
+            <div class="traffic-light red"></div>
+            <div class="traffic-light yellow"></div>
+            <div class="traffic-light green active"></div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="hero-content">
+            <div class="hero-text">
+                <h1>Revolutionize Urban Traffic with AI</h1>
+                <p class="hero-subtitle">Advanced traffic management system powered by machine learning for real-time optimization, predictive analytics, and smart city integration.</p>
+                <div class="hero-stats">
+                    <div class="stat-item">
+                        <span class="stat-number">98.7%</span>
+                        <span class="stat-label">System Efficiency</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">247/250</span>
+                        <span class="stat-label">Active Intersections</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">0.28ms</span>
+                        <span class="stat-label">AI Response Time</span>
+                    </div>
+                </div>
+                <div class="hero-buttons">
+                    <a href="demo.html" class="btn btn-primary">
+                        <i class="icon-play"></i> Live Demo
+                    </a>
+                    <a href="https://github.com/Alims-Repo/smart-traffic-management" class="btn btn-secondary" target="_blank">
+                        <i class="icon-github"></i> View on GitHub
+                    </a>
+                    <a href="documentation.html" class="btn btn-outline">
+                        <i class="icon-book"></i> Documentation
+                    </a>
+                </div>
+            </div>
+            <div class="hero-image">
+                <div class="dashboard-preview">
+                    <img src="assets/images/dashboard-hero.png" alt="Smart Traffic Management Dashboard" class="preview-img">
+                    <div class="live-indicator">
+                        <span class="pulse-dot"></span>
+                        <span class="live-text">LIVE: 2025-06-22 04:51:55 UTC</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Status Bar -->
+<section class="status-bar">
+    <div class="container">
+        <div class="status-items">
+            <div class="status-item">
+                <i class="icon-server status-icon online"></i>
+                <span class="status-text">System Online</span>
+                <span class="status-value">47 days uptime</span>
+            </div>
+            <div class="status-item">
+                <i class="icon-brain status-icon active"></i>
+                <span class="status-text">AI Active</span>
+                <span class="status-value">12 models running</span>
+            </div>
+            <div class="status-item">
+                <i class="icon-users status-icon"></i>
+                <span class="status-text">Current User</span>
+                <span class="status-value">Alims-Repo (Level 3)</span>
+            </div>
+            <div class="status-item">
+                <i class="icon-clock status-icon"></i>
+                <span class="status-text">Last Update</span>
+                <span class="status-value">2025-06-22 04:51:55</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Overview -->
+<section class="features-overview">
+    <div class="container">
+        <div class="section-header">
+            <h2>Intelligent Traffic Management</h2>
+            <p>Cutting-edge technology meets urban infrastructure needs with our comprehensive AI-powered solution.</p>
+        </div>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="icon-monitor"></i>
+                </div>
+                <h3>Real-time Monitoring</h3>
+                <p>Live tracking of 250+ intersections with instant status updates and performance metrics.</p>
+                <div class="feature-stats">
+                    <span class="stat">2,847 vehicles/hour</span>
+                    <span class="stat">99.2% uptime</span>
+                </div>
+                <a href="features.html#monitoring" class="feature-link">Learn More →</a>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="icon-brain"></i>
+                </div>
+                <h3>AI Optimization</h3>
+                <p>Machine learning algorithms continuously optimize signal timing for maximum traffic flow efficiency.</p>
+                <div class="feature-stats">
+                    <span class="stat">97.1% efficiency</span>
+                    <span class="stat">0.28ms response</span>
+                </div>
+                <a href="features.html#ai" class="feature-link">Learn More →</a>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="icon-chart"></i>
+                </div>
+                <h3>Predictive Analytics</h3>
+                <p>Advanced forecasting with 95.7% accuracy to anticipate traffic patterns and prevent congestion.</p>
+                <div class="feature-stats">
+                    <span class="stat">95.7% accuracy</span>
+                    <span class="stat">24/7 predictions</span>
+                </div>
+                <a href="analytics.html" class="feature-link">View Analytics →</a>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="icon-emergency"></i>
+                </div>
+                <h3>Emergency Response</h3>
+                <p>Instant priority routing and emergency override capabilities for first responders and critical situations.</p>
+                <div class="feature-stats">
+                    <span class="stat">-35% faster response</span>
+                    <span class="stat">24/7 ready</span>
+                </div>
+                <a href="features.html#emergency" class="feature-link">Learn More →</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Technology Stack -->
+<section class="tech-stack">
+    <div class="container">
+        <h2>Built with Modern Technology</h2>
+        <div class="tech-categories">
+            <div class="tech-category">
+                <h3>Frontend</h3>
+                <div class="tech-items">
+                    <div class="tech-item">
+                        <img src="assets/images/tech/kotlin.svg" alt="Kotlin">
+                        <span>Kotlin</span>
+                    </div>
+                    <div class="tech-item">
+                        <img src="assets/images/tech/compose.svg" alt="Jetpack Compose">
+                        <span>Jetpack Compose</span>
+                    </div>
+                    <div class="tech-item">
+                        <img src="assets/images/tech/material.svg" alt="Material Design">
+                        <span>Material Design 3</span>
+                    </div>
+                </div>
+            </div>
+            <div class="tech-category">
+                <h3>AI & ML</h3>
+                <div class="tech-items">
+                    <div class="tech-item">
+                        <img src="assets/images/tech/tensorflow.svg" alt="TensorFlow">
+                        <span>TensorFlow Lite</span>
+                    </div>
+                    <div class="tech-item">
+                        <img src="assets/images/tech/ml.svg" alt="Machine Learning">
+                        <span>ML Models</span>
+                    </div>
+                    <div class="tech-item">
+                        <img src="assets/images/tech/ai.svg" alt="AI Optimization">
+                        <span>AI Optimization</span>
+                    </div>
+                </div>
+            </div>
+            <div class="tech-category">
+                <h3>Backend</h3>
+                <div class="tech-items">
+                    <div class="tech-item">
+                        <img src="assets/images/tech/room.svg" alt="Room Database">
+                        <span>Room Database</span>
+                    </div>
+                    <div class="tech-item">
+                        <img src="assets/images/tech/retrofit.svg" alt="Retrofit">
+                        <span>Retrofit</span>
+                    </div>
+                    <div class="tech-item">
+                        <img src="assets/images/tech/coroutines.svg" alt="Coroutines">
+                        <span>Coroutines</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Live Demo Section -->
+<section class="demo-section">
+    <div class="container">
+        <div class="demo-content">
+            <div class="demo-text">
+                <h2>Experience the System Live</h2>
+                <p>Interact with our real-time dashboard and see the AI optimization in action. Monitor traffic patterns, view analytics, and test emergency response features.</p>
+                <ul class="demo-features">
+                    <li><i class="icon-check"></i> Real-time traffic data</li>
+                    <li><i class="icon-check"></i> Interactive dashboard</li>
+                    <li><i class="icon-check"></i> AI optimization controls</li>
+                    <li><i class="icon-check"></i> Emergency simulation</li>
+                </ul>
+                <a href="demo.html" class="btn btn-primary btn-large">
+                    <i class="icon-play"></i> Launch Interactive Demo
+                </a>
+            </div>
+            <div class="demo-preview">
+                <div class="demo-window">
+                    <div class="window-header">
+                        <div class="window-controls">
+                            <span class="control control-close"></span>
+                            <span class="control control-minimize"></span>
+                            <span class="control control-maximize"></span>
+                        </div>
+                        <span class="window-title">Traffic Management Dashboard</span>
+                    </div>
+                    <div class="window-content">
+                        <img src="assets/images/demo-preview.png" alt="Demo Preview">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Performance Metrics -->
+<section class="performance-metrics">
+    <div class="container">
+        <h2>System Performance</h2>
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-icon traffic-flow"></div>
+                <h3>Traffic Flow</h3>
+                <div class="metric-value">+24.1%</div>
+                <div class="metric-change positive">↑ improvement</div>
+                <p>Overall traffic flow efficiency compared to previous system</p>
+            </div>
+            <div class="metric-card">
+                <div class="metric-icon wait-time"></div>
+                <h3>Wait Time</h3>
+                <div class="metric-value">-19.7%</div>
+                <div class="metric-change positive">↓ reduction</div>
+                <p>Average intersection wait time reduction</p>
+            </div>
+            <div class="metric-card">
+                <div class="metric-icon fuel-savings"></div>
+                <h3>Fuel Efficiency</h3>
+                <div class="metric-value">+33.2%</div>
+                <div class="metric-change positive">↑ improvement</div>
+                <p>City-wide fuel efficiency improvement</p>
+            </div>
+            <div class="metric-card">
+                <div class="metric-icon safety-score"></div>
+                <h3>Safety Score</h3>
+                <div class="metric-value">98.7%</div>
+                <div class="metric-change stable">→ excellent</div>
+                <p>Traffic safety compliance rating</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- User Testimonials -->
+<section class="testimonials">
+    <div class="container">
+        <h2>What Traffic Engineers Say</h2>
+        <div class="testimonials-grid">
+            <div class="testimonial-card">
+                <div class="testimonial-content">
+                    <p>"The AI optimization has revolutionized our traffic management. We've seen a 24% improvement in flow efficiency since implementation."</p>
+                </div>
+                <div class="testimonial-author">
+                    <img src="assets/images/testimonials/engineer1.jpg" alt="Traffic Engineer">
+                    <div class="author-info">
+                        <h4>Sarah Chen</h4>
+                        <span>Senior Traffic Engineer</span>
+                    </div>
+                </div>
+            </div>
+            <div class="testimonial-card">
+                <div class="testimonial-content">
+                    <p>"Real-time monitoring and predictive analytics have made our job so much easier. The system anticipates problems before they occur."</p>
+                </div>
+                <div class="testimonial-author">
+                    <img src="assets/images/testimonials/engineer2.jpg" alt="Traffic Engineer">
+                    <div class="author-info">
+                        <h4>Michael Rodriguez</h4>
+                        <span>Traffic Operations Manager</span>
+                    </div>
+                </div>
+            </div>
+            <div class="testimonial-card">
+                <div class="testimonial-content">
+                    <p>"Emergency response capabilities are outstanding. We can clear paths for first responders 35% faster than before."</p>
+                </div>
+                <div class="testimonial-author">
+                    <img src="assets/images/testimonials/engineer3.jpg" alt="Traffic Engineer">
+                    <div class="author-info">
+                        <h4>Dr. Emily Watson</h4>
+                        <span>Transportation Director</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action -->
+<section class="cta-section">
+    <div class="container">
+        <div class="cta-content">
+            <h2>Ready to Transform Your Traffic Management?</h2>
+            <p>Join the smart city revolution with our AI-powered traffic management system. Start optimizing your urban traffic today.</p>
+            <div class="cta-buttons">
+                <a href="contact.html" class="btn btn-primary btn-large">Get Started</a>
+                <a href="documentation.html" class="btn btn-outline btn-large">View Documentation</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-section">
+                <div class="footer-brand">
+                    <img src="assets/images/logo.svg" alt="Smart Traffic Management" class="footer-logo">
+                    <h3>Smart Traffic Management</h3>
+                    <p>Revolutionizing urban traffic control with AI-powered solutions for smart cities worldwide.</p>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h4>Product</h4>
+                <ul>
+                    <li><a href="features.html">Features</a></li>
+                    <li><a href="demo.html">Live Demo</a></li>
+                    <li><a href="analytics.html">Analytics</a></li>
+                    <li><a href="documentation.html">Documentation</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Resources</h4>
+                <ul>
+                    <li><a href="https://github.com/Alims-Repo/smart-traffic-management" target="_blank">GitHub Repository</a></li>
+                    <li><a href="../README.md" target="_blank">README</a></li>
+                    <li><a href="https://github.com/Alims-Repo/smart-traffic-management/discussions" target="_blank">Discussions</a></li>
+                    <li><a href="https://github.com/Alims-Repo/smart-traffic-management/issues" target="_blank">Issues</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Company</h4>
+                <ul>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                    <li><a href="privacy.html">Privacy Policy</a></li>
+                    <li><a href="terms.html">Terms of Service</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="footer-left">
+                <p>&copy; 2025 Alims-Repo. Released under the MIT License.</p>
+            </div>
+            <div class="footer-right">
+                <div class="social-links">
+                    <a href="https://github.com/Alims-Repo" target="_blank"><i class="icon-github"></i></a>
+                    <a href="#" target="_blank"><i class="icon-twitter"></i></a>
+                    <a href="#" target="_blank"><i class="icon-linkedin"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<script src="assets/js/main.js"></script>
+</body>
+</html>
