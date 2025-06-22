@@ -16,10 +16,21 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.gub.features.dashboard.domain.extension.aiResponseTimeSubText
+import com.gub.features.dashboard.domain.extension.aiResponseTimeValue
+import com.gub.features.dashboard.domain.extension.avgWaitTimeSubText
+import com.gub.features.dashboard.domain.extension.avgWaitTimeValue
+import com.gub.features.dashboard.domain.extension.currentFlowSubText
+import com.gub.features.dashboard.domain.extension.currentFlowValue
+import com.gub.features.dashboard.domain.extension.systemHealthSubText
+import com.gub.features.dashboard.domain.extension.systemHealthValue
+import com.gub.features.dashboard.domain.extension.weatherTempSubText
+import com.gub.features.dashboard.domain.extension.weatherTempValue
 import com.gub.features.dashboard.presentation.screens.components.SystemOverviewMetric
+import com.gub.models.dashboard.overview.ModelSystemOverview
 
 @Composable
-fun SystemOverviewCard() {
+fun SystemOverviewCard(systemOverview: ModelSystemOverview) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
@@ -34,7 +45,7 @@ fun SystemOverviewCard() {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    "System Overview",
+                    text = "System Overview",
                     color = MaterialTheme.colorScheme.onSurface,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold
@@ -42,14 +53,14 @@ fun SystemOverviewCard() {
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
-                        Icons.Default.Dashboard,
+                        imageVector = Icons.Default.Dashboard,
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(20.dp)
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        "16:28:43",
+                        text = "16:28:43",
                         color = Color.Gray,
                         fontSize = 12.sp
                     )
@@ -64,40 +75,40 @@ fun SystemOverviewCard() {
             ) {
                 SystemOverviewMetric(
                     title = "System Health",
-                    value = "98.7%",
-                    subtitle = "Excellent",
+                    value = systemOverview.systemHealthValue(),
+                    subtitle = systemOverview.systemHealthSubText(),
                     color = Color(0xFF4CAF50),
                     icon = Icons.Default.CheckCircle
                 )
 
                 SystemOverviewMetric(
-                    title = "Active Intersections",
-                    value = "247/250",
-                    subtitle = "99.2% Online",
+                    title = "Weather Condition",
+                    value = systemOverview.weatherTempValue(),
+                    subtitle = systemOverview.weatherTempSubText(),
                     color = Color(0xFF4CAF50),
                     icon = Icons.Default.Traffic
                 )
 
                 SystemOverviewMetric(
-                    title = "AI Performance",
-                    value = "97.1%",
-                    subtitle = "Optimal",
+                    title = "AI Response Time",
+                    value = systemOverview.aiResponseTimeValue(),
+                    subtitle = systemOverview.aiResponseTimeSubText(),
                     color = Color(0xFF4CAF50),
                     icon = Icons.Default.Psychology
                 )
 
                 SystemOverviewMetric(
                     title = "Current Flow",
-                    value = "2,847",
-                    subtitle = "vehicles/hr",
+                    value = systemOverview.currentFlowValue(),
+                    subtitle = systemOverview.currentFlowSubText(),
                     color = Color(0xFF2196F3),
                     icon = Icons.Default.DirectionsCar
                 )
 
                 SystemOverviewMetric(
                     title = "Avg Wait Time",
-                    value = "31.2s",
-                    subtitle = "↓ 18% today",
+                    value = systemOverview.avgWaitTimeValue(),
+                    subtitle = systemOverview.avgWaitTimeSubText(),
                     color = Color(0xFF4CAF50),
                     icon = Icons.Default.Timer
                 )

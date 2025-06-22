@@ -3,24 +3,104 @@ package com.gub.features.dashboard.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.gub.core.domain.Response
-import com.gub.features.dashboard.data.repository.SystemStatusWebSocket
-import com.gub.models.ModelSystemStatus
+import com.gub.features.dashboard.di.DashboardModule
+import com.gub.features.dashboard.domain.usecase.GetSystemOverviewUseCase
+import com.gub.features.dashboard.domain.usecase.UpdateSystemMetricsUseCase
+import com.gub.models.dashboard.overview.ModelSystemOverview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 
-class ViewModelDashboard : ViewModel() {
+class ViewModelDashboard(
+    private val getSystemOverviewUseCase: GetSystemOverviewUseCase = DashboardModule.getSystemOverviewUseCase,
+    private val updateSystemMetricsUseCase: UpdateSystemMetricsUseCase = DashboardModule.updateSystemMetricsUseCase
+) : ViewModel() {
 
-    private val _systemStatus = MutableStateFlow<Response<ModelSystemStatus>>(Response.Loading)
-    val systemStatus : StateFlow<Response<ModelSystemStatus>> = _systemStatus.asStateFlow()
+    private val _uiState = MutableStateFlow(SystemOverviewUiState())
+    val uiState: StateFlow<SystemOverviewUiState> = _uiState.asStateFlow()
 
     init {
+        observeSystemOverview()
+    }
+
+    private fun observeSystemOverview() {
         viewModelScope.launch {
-            val socket = SystemStatusWebSocket {
-                _systemStatus.value = it
+            getSystemOverviewUseCase.getStream()
+                .catch { exception ->
+                    _uiState.value = _uiState.value.copy(
+                        isLoading = false,
+                        error = exception.message
+                    )
+                }
+                .collect { overview ->
+                    _uiState.value = _uiState.value.copy(
+                        isLoading = false,
+                        systemOverview = overview,
+                        error = null
+                    )
+                }
+        }
+    }
+
+    fun refreshData() {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(isLoading = true)
+
+            getSystemOverviewUseCase().also { response ->
+                when(response) {
+                    is Response.Error -> {
+                        _uiState.value = _uiState.value.copy(
+                            isLoading = false,
+                            error = response.error
+                        )
+                    }
+                    Response.Loading -> TODO()
+                    is Response.Success -> {
+                        _uiState.value = _uiState.value.copy(
+                            isLoading = false,
+                            systemOverview = response.data,
+                            error = null
+                        )
+                    }
+                }
             }
-            socket.connect()
+
+//            getSystemOverviewUseCase().fold(
+//                onSuccess = { overview ->
+//                    _uiState.value = _uiState.value.copy(
+//                        isLoading = false,
+//                        systemOverview = overview,
+//                        error = null
+//                    )
+//                },
+//                onFailure = { exception ->
+//                    _uiState.value = _uiState.value.copy(
+//                        isLoading = false,
+//                        error = exception.message
+//                    )
+//                }
+//            )
+        }
+    }
+
+    fun updateMetrics(overview: ModelSystemOverview) {
+        viewModelScope.launch {
+            updateSystemMetricsUseCase(overview).fold(
+                onSuccess = {
+                    // Handle success
+                },
+                onFailure = { exception ->
+                    _uiState.value = _uiState.value.copy(error = exception.message)
+                }
+            )
         }
     }
 }
+
+data class SystemOverviewUiState(
+    val isLoading: Boolean = true,
+    val systemOverview: ModelSystemOverview = ModelSystemOverview(),
+    val error: String? = null
+)

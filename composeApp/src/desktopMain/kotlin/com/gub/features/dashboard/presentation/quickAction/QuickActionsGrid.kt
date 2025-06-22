@@ -16,11 +16,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.gub.features.dashboard.viewmodel.ViewModelDashboard
 import dev.chrisbanes.haze.HazeState
 import dev.chrisbanes.haze.hazeSource
 
 @Composable
-fun QuickActionsGrid(hazeState: HazeState, top: Dp) {
+fun QuickActionsGrid(viewModelDashboard: ViewModelDashboard, hazeState: HazeState, top: Dp) {
     Column(
         modifier = Modifier
             .fillMaxSize()

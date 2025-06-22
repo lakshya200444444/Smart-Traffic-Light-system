@@ -35,16 +35,16 @@ fun Dashboard() {
     var height by remember { mutableStateOf(0) }
     var selectedTab by remember { mutableStateOf(0) }
 
-//    val viewModelDashboard by remember { mutableStateOf(ViewModelDashboard()) }
+    val viewModelDashboard by remember { mutableStateOf(ViewModelDashboard()) }
 
     AnimatedContent(
         targetState = selectedTab
     ) {
         when(it) {
-            0 -> Overview(hazeState, height.toDp())
-            1 -> LiveStatus(hazeState, height.toDp())
-            2 -> QuickActionsGrid(hazeState, height.toDp())
-            3 -> UserInsightsDashboardCard(hazeState, height.toDp())
+            0 -> Overview(viewModelDashboard, hazeState, height.toDp())
+            1 -> LiveStatus(viewModelDashboard, hazeState, height.toDp())
+            2 -> QuickActionsGrid(viewModelDashboard, hazeState, height.toDp())
+            3 -> UserInsightsDashboardCard(viewModelDashboard, hazeState, height.toDp())
         }
     }
 

@@ -52,9 +52,12 @@ class SystemStatusWebSocket(
 
     override fun onClose(code: Int, reason: String?, remote: Boolean) {
         println("❌ WebSocket Closed. Code: $code, reason: $reason, remote: $remote")
+        onMessageReceived(Response.Error(reason ?: ""))
+
     }
 
     override fun onError(ex: Exception?) {
         println("❌ WebSocket Error: ${ex?.message}")
+        onMessageReceived(Response.Error(ex.toString()))
     }
 }

@@ -9,11 +9,12 @@ import androidx.compose.ui.unit.dp
 import com.gub.features.dashboard.presentation.liveStatus.components.ActiveIncidentsCard
 import com.gub.features.dashboard.presentation.liveStatus.components.LiveSystemStatusCard
 import com.gub.features.dashboard.presentation.liveStatus.components.RealTimeTrafficFlowCard
+import com.gub.features.dashboard.viewmodel.ViewModelDashboard
 import dev.chrisbanes.haze.HazeState
 import dev.chrisbanes.haze.hazeSource
 
 @Composable
-fun LiveStatus(hazeState: HazeState, top: Dp) {
+fun LiveStatus(viewModelDashboard: ViewModelDashboard, hazeState: HazeState, top: Dp) {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()

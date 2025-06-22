@@ -39,7 +39,11 @@ fun SystemStatusCard(response : Response<ModelSystemStatus>) {
                     CircularProgressIndicator()
                 }
                 is Response.Error -> {
-                    Text(response.error)
+                    Text(
+                        text = response.error,
+                        color = MaterialTheme.colorScheme.error,
+                        fontSize = 14.sp
+                    )
                 }
                 is Response.Success -> {
                     StatusItem(

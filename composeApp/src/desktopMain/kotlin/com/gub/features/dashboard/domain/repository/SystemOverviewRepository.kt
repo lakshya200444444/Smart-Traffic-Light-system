@@ -1,0 +1,15 @@
+package com.gub.features.dashboard.domain.repository
+
+
+import com.gub.core.domain.Response
+import com.gub.models.dashboard.overview.ModelSystemOverview
+import kotlinx.coroutines.flow.Flow
+
+interface SystemOverviewRepository {
+
+    suspend fun getSystemOverview(): Response<ModelSystemOverview>
+
+    fun getSystemOverviewStream(): Flow<ModelSystemOverview>
+
+    suspend fun updateSystemMetrics(overview: ModelSystemOverview): Result<Unit>
+}

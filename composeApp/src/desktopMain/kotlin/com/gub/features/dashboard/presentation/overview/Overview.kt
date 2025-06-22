@@ -3,6 +3,7 @@ package com.gub.features.dashboard.presentation.overview
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -11,11 +12,15 @@ import com.gub.features.dashboard.presentation.overview.components.AIStatusCard
 import com.gub.features.dashboard.presentation.overview.components.RecentAlertsCard
 import com.gub.features.dashboard.presentation.overview.components.TopPerformingIntersectionsCard
 import com.gub.features.dashboard.presentation.overview.components.SystemOverviewCard
+import com.gub.features.dashboard.viewmodel.ViewModelDashboard
 import dev.chrisbanes.haze.HazeState
 import dev.chrisbanes.haze.hazeSource
 
 @Composable
-fun Overview(hazeState: HazeState, top: Dp) {
+fun Overview(viewModelDashboard: ViewModelDashboard, hazeState: HazeState, top: Dp) {
+
+    val systemOverview = viewModelDashboard.uiState.collectAsState()
+
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -23,7 +28,8 @@ fun Overview(hazeState: HazeState, top: Dp) {
         verticalArrangement = Arrangement.spacedBy(16.dp),
         contentPadding = PaddingValues(top = top + 24.dp, start = 24.dp, end = 24.dp, bottom = 24.dp)
     ) {
-        item { SystemOverviewCard() }
+
+        item { SystemOverviewCard(systemOverview.value.systemOverview) }
 
         item {
             Row(
