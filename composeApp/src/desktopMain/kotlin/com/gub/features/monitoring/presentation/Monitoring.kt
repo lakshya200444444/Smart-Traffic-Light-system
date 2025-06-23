@@ -137,7 +137,7 @@ fun Monitoring() {
 fun TrafficControlPanelCard(modifier: Modifier = Modifier) {
     Card(
         modifier = modifier,
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF161B22)),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         shape = RoundedCornerShape(12.dp)
     ) {
         Column(
@@ -145,7 +145,7 @@ fun TrafficControlPanelCard(modifier: Modifier = Modifier) {
         ) {
             Text(
                 "Traffic Control",
-                color = Color.White,
+                color = MaterialTheme.colorScheme.onSurface,
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold
             )
@@ -172,7 +172,7 @@ fun TrafficControlPanelCard(modifier: Modifier = Modifier) {
             ControlButton(
                 text = "Manual Control",
                 icon = Icons.Default.TouchApp,
-                color = Color(0xFF2196F3),
+                color = MaterialTheme.colorScheme.primary,
                 description = "Take direct control of signals"
             )
 

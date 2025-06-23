@@ -1,8 +1,14 @@
 package com.gub.features.monitoring.presentation.components
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -17,358 +23,257 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.automirrored.filled.TrendingDown
+import androidx.compose.material.icons.automirrored.filled.TrendingFlat
+import androidx.compose.material.icons.automirrored.filled.TrendingUp
+import androidx.compose.material.icons.filled.Analytics
+import androidx.compose.material.icons.filled.ArrowDownward
+import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DirectionsBus
 import androidx.compose.material.icons.filled.DirectionsCar
+import androidx.compose.material.icons.filled.Error
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.LocalHospital
 import androidx.compose.material.icons.filled.LocalShipping
+import androidx.compose.material.icons.filled.NotificationsActive
+import androidx.compose.material.icons.filled.NotificationsOff
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Thermostat
 import androidx.compose.material.icons.filled.Traffic
+import androidx.compose.material.icons.filled.TrendingDown
+import androidx.compose.material.icons.filled.TrendingFlat
+import androidx.compose.material.icons.filled.TrendingUp
+import androidx.compose.material.icons.filled.TwoWheeler
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material3.Badge
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.times
 import com.gub.core.ui.components.PulsingDot
 import com.gub.features.monitoring.presentation.TrafficLightState
+import kotlinx.coroutines.delay
+import kotlin.math.cos
+import kotlin.math.sin
 
 @Composable
 fun IntersectionOverviewCard(modifier: Modifier = Modifier) {
+    var selectedView by remember { mutableStateOf(IntersectionView.OVERVIEW) }
+    var showAlerts by remember { mutableStateOf(true) }
+
     Card(
         modifier = modifier,
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        shape = RoundedCornerShape(12.dp)
+        shape = RoundedCornerShape(12.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(
             modifier = Modifier.padding(20.dp)
         ) {
-            // Header with status
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+            // Enhanced header with controls
+            IntersectionHeader(
+                selectedView = selectedView,
+                onViewChanged = { selectedView = it },
+                showAlerts = showAlerts,
+                onToggleAlerts = { showAlerts = !showAlerts }
+            )
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            // Alert banner (if alerts are enabled and there are alerts)
+            AnimatedVisibility(
+                visible = showAlerts,
+                enter = slideInVertically() + fadeIn(),
+                exit = slideOutVertically() + fadeOut()
             ) {
                 Column {
+                    AlertBanner(
+                        message = "Heavy traffic detected on Main St eastbound",
+                        severity = AlertSeverity.WARNING,
+                        timestamp = "07:28"
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
+                }
+            }
+
+            // Main intersection visualization
+            when (selectedView) {
+                IntersectionView.OVERVIEW -> {
+                    EnhancedIntersectionLayout()
+                }
+                IntersectionView.HEATMAP -> {
+                    TrafficHeatmapView()
+                }
+                IntersectionView.ANALYTICS -> {
+                    TrafficAnalyticsView()
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Enhanced traffic light status with phase information
+            TrafficPhaseCard()
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // Real-time metrics dashboard
+            MetricsDashboard()
+        }
+    }
+}
+
+@Composable
+private fun IntersectionHeader(
+    selectedView: IntersectionView,
+    onViewChanged: (IntersectionView) -> Unit,
+    showAlerts: Boolean,
+    onToggleAlerts: () -> Unit
+) {
+    Column {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.Top
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     Text(
                         "Main St & 5th Ave",
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        fontSize = 18.sp,
+                        fontSize = 20.sp,
                         fontWeight = FontWeight.Bold
                     )
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.padding(top = 4.dp)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Badge(
+                        containerColor = Color(0xFF4CAF50).copy(alpha = 0.1f),
+                        contentColor = Color(0xFF4CAF50)
                     ) {
-                        Box(
-                            modifier = Modifier
-                                .size(8.dp)
-                                .background(Color(0xFF4CAF50), CircleShape)
-                        )
-                        Spacer(modifier = Modifier.width(6.dp))
                         Text(
-                            "Normal Traffic Flow",
-                            color = Color(0xFF4CAF50),
-                            fontSize = 12.sp,
+                            "ID: 001",
+                            fontSize = 9.sp,
                             fontWeight = FontWeight.Medium
                         )
                     }
                 }
 
-                // Real-time indicator
                 Row(
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(top = 4.dp)
                 ) {
-                    PulsingDot()
-                    Spacer(modifier = Modifier.width(4.dp))
+                    IntersectionStatusIndicator()
+                    Spacer(modifier = Modifier.width(12.dp))
+                    LiveIndicator()
+                    Spacer(modifier = Modifier.width(12.dp))
                     Text(
-                        "LIVE",
-                        color = Color(0xFF4CAF50),
-                        fontSize = 10.sp,
-                        fontWeight = FontWeight.Bold
+                        "Last updated: 07:30:15",
+                        color = Color.Gray,
+                        fontSize = 10.sp
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.height(20.dp))
-
-            // Intersection visualization
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(180.dp)
+            // View controls
+            Row(
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                // Road layout
-                IntersectionLayout()
-
-                // Vehicle positions
-                VehiclePositions()
-
-                // Traffic lights
-                TrafficLights()
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Traffic light status row
-            Card(
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
-                ),
-                shape = RoundedCornerShape(8.dp)
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(12.dp),
-                    horizontalArrangement = Arrangement.SpaceEvenly
+                IconButton(
+                    onClick = onToggleAlerts,
+                    modifier = Modifier.size(24.dp)
                 ) {
-                    TrafficLightStatus("North", TrafficLightState.GREEN, 25)
-                    TrafficLightStatus("East", TrafficLightState.RED, 15)
-                    TrafficLightStatus("South", TrafficLightState.GREEN, 25)
-                    TrafficLightStatus("West", TrafficLightState.RED, 15)
+                    Icon(
+                        if (showAlerts)
+                            Icons.Default.NotificationsActive
+                        else Icons.Default.NotificationsOff,
+                        contentDescription = "Toggle alerts",
+                        tint = if (showAlerts) Color(0xFFFF9800) else Color.Gray,
+                        modifier = Modifier.size(16.dp)
+                    )
+                }
+
+                Spacer(modifier = Modifier.width(4.dp))
+
+                IconButton(
+                    onClick = { /* Refresh data */ },
+                    modifier = Modifier.size(24.dp)
+                ) {
+                    Icon(
+                        Icons.Default.Refresh,
+                        contentDescription = "Refresh",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.size(16.dp)
+                    )
                 }
             }
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            // Quick stats
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                QuickStat("Wait Time", "2.3 min", Color(0xFF4CAF50))
-                QuickStat("Queue Length", "8 vehicles", Color(0xFFFF9800))
-                QuickStat("Efficiency", "94%", Color(0xFF4CAF50))
-            }
-        }
-    }
-}
-
-@Composable
-private fun IntersectionLayout() {
-    Box(modifier = Modifier.fillMaxSize()) {
-        // Horizontal road (Main St)
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(60.dp)
-                .align(Alignment.Center)
-                .background(Color(0xFF37474F), RoundedCornerShape(4.dp))
-        ) {
-            // Road markings
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(2.dp)
-                    .align(Alignment.Center)
-                    .background(Color.White.copy(alpha = 0.6f))
-            )
         }
 
-        // Vertical road (5th Ave)
-        Box(
-            modifier = Modifier
-                .width(60.dp)
-                .fillMaxHeight()
-                .align(Alignment.Center)
-                .background(Color(0xFF37474F), RoundedCornerShape(4.dp))
-        ) {
-            // Road markings
-            Box(
-                modifier = Modifier
-                    .width(2.dp)
-                    .fillMaxHeight()
-                    .align(Alignment.Center)
-                    .background(Color.White.copy(alpha = 0.6f))
-            )
-        }
-
-        // Intersection center
-        Box(
-            modifier = Modifier
-                .size(60.dp)
-                .align(Alignment.Center)
-                .background(Color(0xFF455A64), RoundedCornerShape(4.dp))
-        )
-
-        // Street labels
-        Text(
-            "Main St",
-            color = Color.White,
-            fontSize = 10.sp,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier
-                .align(Alignment.CenterStart)
-                .padding(start = 8.dp)
-        )
-
-        Text(
-            "5th Ave",
-            color = Color.White,
-            fontSize = 10.sp,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier
-                .align(Alignment.TopCenter)
-                .padding(top = 8.dp)
+        // View selector tabs
+        Spacer(modifier = Modifier.height(12.dp))
+        ViewSelectorTabs(
+            selectedView = selectedView,
+            onViewChanged = onViewChanged
         )
     }
 }
 
 @Composable
-private fun VehiclePositions() {
-    Box(modifier = Modifier.fillMaxSize()) {
-        // Vehicles on Main St (horizontal)
-        VehicleIcon(
-            modifier = Modifier
-                .align(Alignment.CenterStart)
-                .offset(x = 20.dp),
-            direction = VehicleDirection.EAST,
-            type = VehicleType.CAR
-        )
+private fun IntersectionStatusIndicator() {
+    val status = IntersectionStatus.NORMAL // This would come from your data
 
-        VehicleIcon(
-            modifier = Modifier
-                .align(Alignment.CenterEnd)
-                .offset(x = (-20).dp),
-            direction = VehicleDirection.WEST,
-            type = VehicleType.TRUCK
-        )
-
-        // Vehicles on 5th Ave (vertical)
-        VehicleIcon(
-            modifier = Modifier
-                .align(Alignment.TopCenter)
-                .offset(y = 40.dp),
-            direction = VehicleDirection.SOUTH,
-            type = VehicleType.CAR
-        )
-
-        VehicleIcon(
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .offset(y = (-40).dp),
-            direction = VehicleDirection.NORTH,
-            type = VehicleType.BUS
-        )
-    }
-}
-
-@Composable
-private fun TrafficLights() {
-    Box(modifier = Modifier.fillMaxSize()) {
-        // North traffic light
-        TrafficLightIndicator(
-            modifier = Modifier
-                .align(Alignment.TopCenter)
-                .offset(y = 15.dp, x = 20.dp),
-            state = TrafficLightState.GREEN
-        )
-
-        // East traffic light
-        TrafficLightIndicator(
-            modifier = Modifier
-                .align(Alignment.CenterEnd)
-                .offset(x = (-15).dp, y = (-20).dp),
-            state = TrafficLightState.RED
-        )
-
-        // South traffic light
-        TrafficLightIndicator(
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .offset(y = (-15).dp, x = (-20).dp),
-            state = TrafficLightState.GREEN
-        )
-
-        // West traffic light
-        TrafficLightIndicator(
-            modifier = Modifier
-                .align(Alignment.CenterStart)
-                .offset(x = 15.dp, y = 20.dp),
-            state = TrafficLightState.RED
-        )
-    }
-}
-
-@Composable
-private fun VehicleIcon(
-    modifier: Modifier = Modifier,
-    direction: VehicleDirection,
-    type: VehicleType
-) {
-    Box(
-        modifier = modifier
-            .size(12.dp)
-            .background(
-                color = when (type) {
-                    VehicleType.CAR -> Color(0xFF2196F3)
-                    VehicleType.TRUCK -> Color(0xFFFF9800)
-                    VehicleType.BUS -> Color(0xFF4CAF50)
-                },
-                shape = RoundedCornerShape(2.dp)
-            )
+    Row(
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Icon(
-            imageVector = when (type) {
-                VehicleType.CAR -> Icons.Default.DirectionsCar
-                VehicleType.TRUCK -> Icons.Default.LocalShipping
-                VehicleType.BUS -> Icons.Default.DirectionsBus
-            },
-            contentDescription = null,
-            tint = Color.White,
+        Box(
             modifier = Modifier
                 .size(8.dp)
-                .align(Alignment.Center)
+                .background(status.color, CircleShape)
+        )
+        Spacer(modifier = Modifier.width(6.dp))
+        Text(
+            status.displayName,
+            color = status.color,
+            fontSize = 12.sp,
+            fontWeight = FontWeight.Medium
         )
     }
 }
 
 @Composable
-private fun TrafficLightIndicator(
-    modifier: Modifier = Modifier,
-    state: TrafficLightState
-) {
-    Box(
-        modifier = modifier
-            .size(8.dp)
-            .background(state.color, CircleShape)
-    )
-}
-
-@Composable
-private fun TrafficLightStatus(
-    direction: String,
-    state: TrafficLightState,
-    timeRemaining: Int
-) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.padding(horizontal = 8.dp)
+private fun LiveIndicator() {
+    Row(
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(10.dp)
-                    .background(state.color, CircleShape)
-            )
-            Spacer(modifier = Modifier.width(4.dp))
-            Text(
-                direction,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                fontSize = 11.sp,
-                fontWeight = FontWeight.Medium
-            )
-        }
-
+        PulsingDot()
+        Spacer(modifier = Modifier.width(4.dp))
         Text(
-            "${timeRemaining}s",
-            color = state.color,
+            "LIVE",
+            color = Color(0xFF4CAF50),
             fontSize = 10.sp,
             fontWeight = FontWeight.Bold
         )
@@ -376,33 +281,699 @@ private fun TrafficLightStatus(
 }
 
 @Composable
-private fun QuickStat(
+private fun ViewSelectorTabs(
+    selectedView: IntersectionView,
+    onViewChanged: (IntersectionView) -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        IntersectionView.values().forEach { view ->
+            FilterChip(
+                onClick = { onViewChanged(view) },
+                label = {
+                    Text(
+                        view.displayName,
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                },
+                selected = selectedView == view,
+                leadingIcon = {
+                    Icon(
+                        view.icon,
+                        contentDescription = null,
+                        modifier = Modifier.size(12.dp)
+                    )
+                },
+                colors = FilterChipDefaults.filterChipColors(
+                    selectedContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
+                    selectedLabelColor = MaterialTheme.colorScheme.primary
+                ),
+                modifier = Modifier.height(28.dp)
+            )
+        }
+    }
+}
+
+@Composable
+private fun AlertBanner(
+    message: String,
+    severity: AlertSeverity,
+    timestamp: String
+) {
+    Card(
+        colors = CardDefaults.cardColors(
+            containerColor = severity.backgroundColor
+        ),
+        shape = RoundedCornerShape(8.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                severity.icon,
+                contentDescription = null,
+                tint = severity.iconColor,
+                modifier = Modifier.size(16.dp)
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    message,
+                    color = severity.textColor,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Medium
+                )
+                Text(
+                    "Detected at $timestamp",
+                    color = severity.textColor.copy(alpha = 0.8f),
+                    fontSize = 10.sp
+                )
+            }
+            IconButton(
+                onClick = { /* Dismiss alert */ },
+                modifier = Modifier.size(20.dp)
+            ) {
+                Icon(
+                    Icons.Default.Close,
+                    contentDescription = "Dismiss",
+                    tint = severity.iconColor,
+                    modifier = Modifier.size(12.dp)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun EnhancedIntersectionLayout() {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(200.dp)
+    ) {
+        // Enhanced road layout with lane markings
+        IntersectionRoadNetwork()
+
+        // Animated vehicles with movement
+        AnimatedVehiclePositions()
+
+        // Traffic lights with current phase
+//        TrafficLightSystem()
+
+        // Pedestrian crossings
+        PedestrianCrossings()
+
+        // Traffic sensors
+        TrafficSensors()
+    }
+}
+
+@Composable
+private fun IntersectionRoadNetwork() {
+    Box(modifier = Modifier.fillMaxSize()) {
+        // Main Street (horizontal) with multiple lanes
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(80.dp)
+                .align(Alignment.Center)
+                .background(Color(0xFF37474F), RoundedCornerShape(6.dp))
+        ) {
+            // Lane dividers
+            repeat(3) { lane ->
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(1.dp)
+                        .align(Alignment.Center)
+                        .offset(y = (lane - 1) * 20.dp)
+                        .background(Color.White.copy(alpha = 0.4f))
+                )
+            }
+        }
+
+        // 5th Avenue (vertical) with multiple lanes
+        Box(
+            modifier = Modifier
+                .width(80.dp)
+                .fillMaxHeight()
+                .align(Alignment.Center)
+                .background(Color(0xFF37474F), RoundedCornerShape(6.dp))
+        ) {
+            // Lane dividers
+            repeat(3) { lane ->
+                Box(
+                    modifier = Modifier
+                        .width(1.dp)
+                        .fillMaxHeight()
+                        .align(Alignment.Center)
+                        .offset(x = (lane - 1) * 20.dp)
+                        .background(Color.White.copy(alpha = 0.4f))
+                )
+            }
+        }
+
+        // Intersection center with turning lanes
+        Box(
+            modifier = Modifier
+                .size(80.dp)
+                .align(Alignment.Center)
+                .background(Color(0xFF455A64), RoundedCornerShape(6.dp))
+        )
+
+        // Street labels with direction arrows
+        StreetLabels()
+    }
+}
+
+@Composable
+private fun StreetLabels() {
+    Box(modifier = Modifier.fillMaxSize()) {
+        // Main St label
+        Card(
+            modifier = Modifier
+                .align(Alignment.CenterStart)
+                .padding(start = 8.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = Color.Black.copy(alpha = 0.7f)
+            ),
+            shape = RoundedCornerShape(4.dp)
+        ) {
+            Row(
+                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    "Main St",
+                    color = Color.White,
+                    fontSize = 9.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                Spacer(modifier = Modifier.width(2.dp))
+                Icon(
+                    Icons.Default.ArrowForward,
+                    contentDescription = null,
+                    tint = Color.White,
+                    modifier = Modifier.size(8.dp)
+                )
+            }
+        }
+
+        // 5th Ave label
+        Card(
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .padding(top = 8.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = Color.Black.copy(alpha = 0.7f)
+            ),
+            shape = RoundedCornerShape(4.dp)
+        ) {
+            Column(
+                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    "5th Ave",
+                    color = Color.White,
+                    fontSize = 9.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                Icon(
+                    Icons.Default.ArrowDownward,
+                    contentDescription = null,
+                    tint = Color.White,
+                    modifier = Modifier.size(8.dp)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun AnimatedVehiclePositions() {
+    var animationTime by remember { mutableStateOf(0f) }
+
+    LaunchedEffect(Unit) {
+        while (true) {
+            animationTime += 0.1f
+            delay(500)
+        }
+    }
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        // Moving vehicles with animation
+        EnhancedVehicleIcon(
+            modifier = Modifier
+                .align(Alignment.CenterStart)
+                .offset(
+                    x = 25.dp + (sin(animationTime) * 5).dp,
+                    y = (-15).dp
+                ),
+            type = VehicleType.CAR,
+            direction = VehicleDirection.EAST,
+            speed = VehicleSpeed.NORMAL
+        )
+
+        EnhancedVehicleIcon(
+            modifier = Modifier
+                .align(Alignment.CenterEnd)
+                .offset(
+                    x = (-25).dp - (sin(animationTime) * 3).dp,
+                    y = 15.dp
+                ),
+            type = VehicleType.TRUCK,
+            direction = VehicleDirection.WEST,
+            speed = VehicleSpeed.SLOW
+        )
+
+        EnhancedVehicleIcon(
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .offset(
+                    x = 15.dp,
+                    y = 45.dp + (cos(animationTime) * 4).dp
+                ),
+            type = VehicleType.BUS,
+            direction = VehicleDirection.SOUTH,
+            speed = VehicleSpeed.NORMAL
+        )
+    }
+}
+
+@Composable
+private fun EnhancedVehicleIcon(
+    modifier: Modifier = Modifier,
+    type: VehicleType,
+    direction: VehicleDirection,
+    speed: VehicleSpeed
+) {
+    Box(
+        modifier = modifier
+    ) {
+        // Vehicle shadow
+        Box(
+            modifier = Modifier
+                .size(14.dp, 8.dp)
+                .offset(x = 1.dp, y = 1.dp)
+                .background(
+                    Color.Black.copy(alpha = 0.2f),
+                    RoundedCornerShape(2.dp)
+                )
+        )
+
+        // Main vehicle
+        Box(
+            modifier = Modifier
+                .size(14.dp, 8.dp)
+                .background(
+                    color = type.color,
+                    shape = RoundedCornerShape(2.dp)
+                ),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = type.icon,
+                contentDescription = null,
+                tint = Color.White,
+                modifier = Modifier.size(10.dp)
+            )
+        }
+
+        // Speed indicator
+        if (speed == VehicleSpeed.FAST) {
+            Box(
+                modifier = Modifier
+                    .size(4.dp)
+                    .align(Alignment.TopEnd)
+                    .background(Color(0xFFFF5722), CircleShape)
+            )
+        }
+    }
+}
+
+@Composable
+private fun TrafficPhaseCard() {
+    Card(
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+        ),
+        shape = RoundedCornerShape(8.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(12.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    "Current Phase: North-South Green",
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Medium
+                )
+                Text(
+                    "Cycle: 2/4",
+                    color = Color.Gray,
+                    fontSize = 10.sp
+                )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                EnhancedTrafficLightStatus("North", TrafficLightState.GREEN, 22, 45)
+                EnhancedTrafficLightStatus("East", TrafficLightState.RED, 22, 30)
+                EnhancedTrafficLightStatus("South", TrafficLightState.GREEN, 22, 45)
+                EnhancedTrafficLightStatus("West", TrafficLightState.RED, 22, 30)
+            }
+        }
+    }
+}
+
+@Composable
+private fun EnhancedTrafficLightStatus(
+    direction: String,
+    state: TrafficLightState,
+    timeRemaining: Int,
+    totalTime: Int
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.padding(horizontal = 4.dp)
+    ) {
+        // Progress ring
+        Box(
+            modifier = Modifier.size(32.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator(
+                progress = timeRemaining.toFloat() / totalTime,
+                modifier = Modifier.fillMaxSize(),
+                color = state.color.copy(alpha = 0.3f),
+                strokeWidth = 2.dp,
+                trackColor = Color.Gray.copy(alpha = 0.2f)
+            )
+
+            Box(
+                modifier = Modifier
+                    .size(12.dp)
+                    .background(state.color, CircleShape)
+            )
+        }
+
+        Spacer(modifier = Modifier.height(4.dp))
+
+        Text(
+            direction,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            fontSize = 10.sp,
+            fontWeight = FontWeight.Medium
+        )
+
+        Text(
+            "${timeRemaining}s",
+            color = state.color,
+            fontSize = 9.sp,
+            fontWeight = FontWeight.Bold
+        )
+    }
+}
+
+@Composable
+private fun MetricsDashboard() {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        EnhancedMetricItem(
+            label = "Wait Time",
+            value = "2.3",
+            unit = "min",
+            trend = MetricTrend.DOWN,
+            color = Color(0xFF4CAF50)
+        )
+        EnhancedMetricItem(
+            label = "Queue",
+            value = "8",
+            unit = "cars",
+            trend = MetricTrend.STABLE,
+            color = Color(0xFFFF9800)
+        )
+        EnhancedMetricItem(
+            label = "Efficiency",
+            value = "94",
+            unit = "%",
+            trend = MetricTrend.UP,
+            color = Color(0xFF4CAF50)
+        )
+        EnhancedMetricItem(
+            label = "Throughput",
+            value = "342",
+            unit = "/hr",
+            trend = MetricTrend.UP,
+            color = Color(0xFF2196F3)
+        )
+    }
+}
+
+@Composable
+private fun EnhancedMetricItem(
     label: String,
     value: String,
+    unit: String,
+    trend: MetricTrend,
     color: Color
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(
-            value,
-            color = color,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Bold
-        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                value,
+                color = color,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                unit,
+                color = color.copy(alpha = 0.7f),
+                fontSize = 10.sp,
+                modifier = Modifier.padding(start = 2.dp)
+            )
+            Spacer(modifier = Modifier.width(2.dp))
+            Icon(
+                trend.icon,
+                contentDescription = null,
+                tint = trend.color,
+                modifier = Modifier.size(8.dp)
+            )
+        }
         Text(
             label,
             color = Color.Gray,
-            fontSize = 10.sp
+            fontSize = 9.sp
         )
     }
 }
 
-// Enums for better type safety
-enum class VehicleDirection {
-    NORTH, SOUTH, EAST, WEST
+// Additional data classes and enums
+enum class IntersectionView(val displayName: String, val icon: ImageVector) {
+    OVERVIEW("Overview", Icons.Default.Visibility),
+    HEATMAP("Heatmap", Icons.Default.Thermostat),
+    ANALYTICS("Analytics", Icons.Default.Analytics)
 }
 
-enum class VehicleType {
-    CAR, TRUCK, BUS
+enum class IntersectionStatus(val displayName: String, val color: Color) {
+    NORMAL("Normal Flow", Color(0xFF4CAF50)),
+    CONGESTED("Congested", Color(0xFFFF9800)),
+    CRITICAL("Critical", Color(0xFFF44336)),
+    MAINTENANCE("Maintenance", Color(0xFF9E9E9E))
+}
+
+enum class AlertSeverity(
+    val backgroundColor: Color,
+    val iconColor: Color,
+    val textColor: Color,
+    val icon: ImageVector
+) {
+    INFO(
+        Color(0xFF2196F3).copy(alpha = 0.1f),
+        Color(0xFF2196F3),
+        Color(0xFF2196F3),
+        Icons.Default.Info
+    ),
+    WARNING(
+        Color(0xFFFF9800).copy(alpha = 0.1f),
+        Color(0xFFFF9800),
+        Color(0xFFFF9800),
+        Icons.Default.Warning
+    ),
+    ERROR(
+        Color(0xFFF44336).copy(alpha = 0.1f),
+        Color(0xFFF44336),
+        Color(0xFFF44336),
+        Icons.Default.Error
+    )
+}
+
+enum class VehicleSpeed {
+    SLOW, NORMAL, FAST
+}
+
+enum class MetricTrend(val icon: ImageVector, val color: Color) {
+    UP(Icons.Default.TrendingUp, Color(0xFF4CAF50)),
+    DOWN(Icons.Default.TrendingDown, Color(0xFFF44336)),
+    STABLE(Icons.Default.TrendingFlat, Color(0xFFFF9800))
+}
+
+// Enhanced VehicleType with more properties
+enum class VehicleType(val icon: ImageVector, val color: Color) {
+    CAR(Icons.Default.DirectionsCar, Color(0xFF2196F3)),
+    TRUCK(Icons.Default.LocalShipping, Color(0xFFFF9800)),
+    BUS(Icons.Default.DirectionsBus, Color(0xFF4CAF50)),
+    MOTORCYCLE(Icons.Default.TwoWheeler, Color(0xFF9C27B0)),
+    EMERGENCY(Icons.Default.LocalHospital, Color(0xFFF44336))
+}
+
+@Composable
+private fun TrafficHeatmapView() {
+    // Placeholder for heatmap view
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(200.dp)
+            .background(
+                Color(0xFF0D1117),
+                RoundedCornerShape(8.dp)
+            ),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Icon(
+                Icons.Default.Thermostat,
+                contentDescription = null,
+                tint = Color.Gray,
+                modifier = Modifier.size(32.dp)
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                "Traffic Heatmap",
+                color = Color.Gray,
+                fontSize = 14.sp
+            )
+            Text(
+                "Coming Soon",
+                color = Color.Gray,
+                fontSize = 10.sp
+            )
+        }
+    }
+}
+
+@Composable
+private fun TrafficAnalyticsView() {
+    // Placeholder for analytics view
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(200.dp)
+            .background(
+                Color(0xFF0D1117),
+                RoundedCornerShape(8.dp)
+            ),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Icon(
+                Icons.Default.Analytics,
+                contentDescription = null,
+                tint = Color.Gray,
+                modifier = Modifier.size(32.dp)
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                "Traffic Analytics",
+                color = Color.Gray,
+                fontSize = 14.sp
+            )
+            Text(
+                "Coming Soon",
+                color = Color.Gray,
+                fontSize = 10.sp
+            )
+        }
+    }
+}
+
+@Composable
+private fun PedestrianCrossings() {
+    // Add pedestrian crossing indicators
+    Box(modifier = Modifier.fillMaxSize()) {
+        // North crossing
+        Box(
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .offset(y = 35.dp)
+                .size(20.dp, 4.dp)
+                .background(
+                    Color.White.copy(alpha = 0.8f),
+                    RoundedCornerShape(2.dp)
+                )
+        )
+
+        // South crossing
+        Box(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .offset(y = (-35).dp)
+                .size(20.dp, 4.dp)
+                .background(
+                    Color.White.copy(alpha = 0.8f),
+                    RoundedCornerShape(2.dp)
+                )
+        )
+    }
+}
+
+@Composable
+private fun TrafficSensors() {
+    // Add traffic sensor indicators
+    Box(modifier = Modifier.fillMaxSize()) {
+        listOf(
+            Alignment.TopStart to DpOffset(30.dp, 20.dp),
+            Alignment.TopEnd to DpOffset((-30).dp, 20.dp),
+            Alignment.BottomStart to DpOffset(30.dp, (-20).dp),
+            Alignment.BottomEnd to DpOffset((-30).dp, (-20).dp)
+        ).forEach { (alignment, offset) ->
+            Box(
+                modifier = Modifier
+                    .align(alignment)
+                    .offset(offset.x, offset.y)
+                    .size(6.dp)
+                    .background(Color(0xFF00BCD4), CircleShape)
+            )
+        }
+    }
+}
+
+enum class VehicleDirection {
+    NORTH, SOUTH, EAST, WEST
 }
