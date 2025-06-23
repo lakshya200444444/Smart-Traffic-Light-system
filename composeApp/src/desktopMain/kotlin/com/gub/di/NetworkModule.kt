@@ -12,7 +12,7 @@ import kotlinx.serialization.json.Json
 object NetworkModule {
 
     fun provideHttpClient(): HttpClient {
-        return HttpClient(CIO) { // CIO engine is best for desktop applications
+        return HttpClient(CIO) {
             install(ContentNegotiation) {
                 json(Json {
                     ignoreUnknownKeys = true
