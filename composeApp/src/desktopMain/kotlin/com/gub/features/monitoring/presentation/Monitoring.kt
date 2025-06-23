@@ -1,5 +1,8 @@
 package com.gub.features.monitoring.presentation
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -31,9 +34,30 @@ import dev.chrisbanes.haze.rememberHazeState
 fun Monitoring() {
     var selectedIntersection by remember { mutableStateOf(0) }
     var isLiveView by remember { mutableStateOf(true) }
+    var isCameraExpanded by remember { mutableStateOf(false) }
 
     val hazeState = rememberHazeState()
     var height by remember { mutableStateOf(0) }
+
+//    AnimatedContent(
+//        targetState = isCameraExpanded
+//    ) {
+//        if (it) {
+//            if (isCameraExpanded)
+//                // Full width camera feed when expanded
+//                LiveCameraFeedCard(
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .animateContentSize(
+//                            animationSpec = tween(300)
+//                        ),
+//                    isExpanded = true,
+//                    onToggleExpand = { isCameraExpanded = !isCameraExpanded }
+//                )
+//        } else {
+//
+//        }
+//    }
 
     LazyColumn(
         modifier = Modifier
@@ -43,38 +67,60 @@ fun Monitoring() {
         contentPadding = PaddingValues(top = height.toDp() + 24.dp, start = 24.dp, end = 24.dp, bottom = 24.dp)
     ) {
 
-        item {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                IntersectionOverviewCard(modifier = Modifier.weight(2f))
-                TrafficControlPanelCard(modifier = Modifier.weight(1f))
-            }
-        }
-
-        item {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                IntersectionSelectorCard(
-                    selectedIntersection = selectedIntersection,
-                    onIntersectionSelected = { selectedIntersection = it },
-                    modifier = Modifier.weight(1f)
+        if (isCameraExpanded) {
+            item {
+                LiveCameraFeedCard(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .animateContentSize(
+                            animationSpec = tween(300)
+                        ),
+                    isExpanded = true,
+                    onToggleExpand = { isCameraExpanded = !isCameraExpanded }
                 )
-                LiveCameraFeedCard(modifier = Modifier.weight(1f))
             }
-        }
+        } else {
+            item {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    IntersectionOverviewCard(modifier = Modifier.weight(2f))
+                    TrafficControlPanelCard(modifier = Modifier.weight(1f))
+                }
+            }
 
-        item {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                VehicleCountCard(modifier = Modifier.weight(1f))
-                SignalTimingCard(modifier = Modifier.weight(1f))
-                EnvironmentalDataCard(modifier = Modifier.weight(1f))
+            item {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    IntersectionSelectorCard(
+                        selectedIntersection = selectedIntersection,
+                        onIntersectionSelected = { selectedIntersection = it },
+                        modifier = Modifier.weight(1f)
+                    )
+                    LiveCameraFeedCard(
+                        modifier = Modifier
+                            .weight(1f)
+                            .animateContentSize(
+                                animationSpec = tween(300)
+                            ),
+                        isExpanded = false,
+                        onToggleExpand = { isCameraExpanded = !isCameraExpanded }
+                    )
+                }
+            }
+
+            item {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    VehicleCountCard(modifier = Modifier.weight(1f))
+                    SignalTimingCard(modifier = Modifier.weight(1f))
+                    EnvironmentalDataCard(modifier = Modifier.weight(1f))
+                }
             }
         }
     }
@@ -84,6 +130,8 @@ fun Monitoring() {
         topBarHeight = { height = it }
     )
 }
+
+// ... rest of your existing composables remain the same ...
 
 @Composable
 fun TrafficControlPanelCard(modifier: Modifier = Modifier) {

@@ -139,8 +139,8 @@ fun ThemeSelector(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(
-                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.75f),
-                    shape = RoundedCornerShape(20.dp)
+                    color = MaterialTheme.colorScheme.surfaceVariant,
+                    shape = RoundedCornerShape(12.dp)
                 )
                 .padding(4.dp),
             horizontalArrangement = Arrangement.spacedBy(4.dp)
@@ -188,8 +188,8 @@ fun ThemeOption(
         modifier = modifier
             .background(
                 color = backgroundColor,
-                shape = RoundedCornerShape(16.dp)
-            ).clip(RoundedCornerShape(16.dp))
+                shape = RoundedCornerShape(12.dp)
+            ).clip(RoundedCornerShape(12.dp))
             .clickable { onClick() }
             .padding(vertical = 12.dp, horizontal = 16.dp),
         contentAlignment = Alignment.Center
