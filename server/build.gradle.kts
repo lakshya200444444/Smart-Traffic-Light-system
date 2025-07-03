@@ -26,6 +26,12 @@ dependencies {
     implementation("io.ktor:ktor-server-core:2.3.10")
     implementation("io.ktor:ktor-server-netty:2.3.10")
 
+    // Database
+    implementation("org.jetbrains.exposed:exposed-core:0.50.1")
+    implementation("org.jetbrains.exposed:exposed-dao:0.50.1")
+    implementation("org.jetbrains.exposed:exposed-jdbc:0.50.1")
+    implementation("org.postgresql:postgresql:42.7.3")
+
     // WebSockets
     implementation("io.ktor:ktor-server-websockets:2.3.10")
     implementation("io.ktor:ktor-server-cio-jvm:2.3.11")

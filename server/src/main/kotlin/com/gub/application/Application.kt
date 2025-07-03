@@ -1,6 +1,7 @@
 package com.gub.application
 
 import com.gub.SERVER_PORT
+import com.gub.database.DatabaseFactory
 import com.gub.routes.dashboardRoutes
 import com.gub.routes.systemRoutes
 import io.ktor.serialization.kotlinx.json.json
@@ -26,6 +27,9 @@ fun Application.module() {
     install(ContentNegotiation) {
         json()
     }
+
+    DatabaseFactory.init()
+//    createSchema()
 
     systemRoutes()
     dashboardRoutes()
