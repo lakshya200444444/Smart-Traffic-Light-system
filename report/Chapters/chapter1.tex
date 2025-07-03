@@ -1,3 +1,5 @@
+\setlength{\parskip}{1em}    % Adds space between paragraphs
+\setlength{\parindent}{0pt}  % Removes default indentation
 \chapter{Introduction}
 
 \section{Background}
@@ -13,39 +15,16 @@ This project builds upon these advancements by proposing an AI-Based Traffic Man
 \section{Problem Statement} As urban areas continue to grow, traffic congestion has become a major challenge for cities around the world. Traditional traffic management systems rely on fixed signal timings and manual controls, which are often inefficient in handling real-time traffic conditions. These outdated systems lead to increased travel time, fuel consumption, road accidents, and environmental pollution.There is a lack of intelligent, responsive systems that can adapt to the constantly changing traffic flow and prioritize emergency situations. Without the use of real-time data and smart decision-making, traffic control remains slow, ineffective, and frustrating for daily commuters.This project aims to address these issues by developing an AI-Based Traffic Management System that can intelligently monitor, analyze, and manage traffic flow in real time to improve overall road efficiency and safety.
 
 \section{Purpose of the Project/Thesis}
-
-The main purpose of this project is to develop an intelligent traffic management system that uses artificial intelligence to reduce traffic congestion, improve traffic flow, and enhance road safety. By analyzing real-time data from sensors and cameras, the system aims to make dynamic decisions for controlling traffic signals, identifying congestion, and prioritizing emergency vehicles. This project seeks to provide a smarter, more efficient alternative to traditional traffic systems, ultimately contributing to smoother transportation and more sustainable urban living.
+The purpose of this project is to design and implement an AI-Based Traffic Management System that uses real-time vehicle detection and contextual data to optimize traffic signal control. By leveraging technologies like YOLOv8, Kotlin, and machine learning, the system aims to reduce congestion, improve traffic flow, and contribute to the development of smart and sustainable urban infrastructure.
 
 \section{Introduction Chapter Example}
 With the increasing number of vehicles on the road, managing traffic efficiently has become a serious challenge, especially in busy urban areas. Traditional traffic systems often work on fixed timings and cannot adjust to real-time road conditions, which leads to unnecessary delays, congestion, and frustration among drivers.To solve this problem, our project introduces an AI-Based Traffic Management System that uses artificial intelligence to monitor and control traffic in a smarter way. The system collects real-time data from various sources like sensors, cameras, and GPS, and uses AI algorithms to analyze traffic flow. Based on the current situation, it adjusts traffic signals and helps manage congestion more effectively. It can also give priority to emergency vehicles and improve overall road safety.This system aims to reduce traffic jams, save time, lower fuel consumption, and support the development of smart cities by making traffic management more intelligent and responsive.
 
 \section{Historical Observations}
-During the seventeenth century, Tycho Brahe measured the diurnal parallax of Mars that Johannes Kepler used to make a preliminary calculation of the relative distance to the planet. When the telescope became available, the diurnal parallax of Mars was again measured in an effort to determine the Sun-Earth distance. This was first performed by Giovanni Domenico Cassini in 1672. The early parallax measurements were hampered by the quality of the instruments. The only occultation of Mars by Venus observed was that of 13 October 1590, seen by Michael Maestlin at Heidelberg. In 1610, Mars was viewed by Italian astronomer Galileo Galilei, who was first to see it via telescope. A portait of Galileo Galilei is depicted in Fig \ref{fig:galileo}. The first person to draw a map of Mars that displayed any terrain features was the Dutch astronomer Christiaan Huygens.
+Historically, urban traffic management has relied on fixed-time traffic signals and manual control mechanisms. These systems were designed based on average traffic conditions and follow pre-programmed cycles that do not account for real-time traffic fluctuations. While such methods were initially effective during periods of low vehicle density, they have proven inadequate in handling the dynamic and high-volume traffic observed in modern cities.
 
-\begin{figure}[ht]
-    \centering
-    \includegraphics[width=0.40\textwidth]{Images/Galileo.jpg}
-    \caption{Galileo Galilei, first person to see Mars via telescope in 1610.}
-    \label{fig:galileo}
-\end{figure}
+In Bangladesh, traffic congestion has steadily worsened over the past two decades due to rapid urbanization, insufficient infrastructure development, and poor enforcement of traffic regulations. Intersections such as Mirpur 10, Farmgate, and Motijheel in Dhaka experience severe congestion throughout the day, particularly during peak hours. The lack of adaptive signal systems means that vehicles from less congested directions often receive equal or more signal time than heavily congested ones, resulting in inefficient traffic flow and bottlenecks.
 
-\section{Climate of Mars}
+Attempts have been made to introduce semi-automatic signal systems, but these are still largely dependent on human monitoring and do not scale well in complex environments. In recent years, some cities have begun exploring smart traffic solutions using sensors and IoT technologies, but these implementations remain limited in scope and have not been fully integrated into the national infrastructure.
 
-The climate of Mars has been a topic of scientific curiosity for centuries, in part because it is the only terrestrial planet whose surface can be directly observed in detail from the Earth with help from a telescope.
-
-Although Mars is smaller than the Earth, 11\% of Earth's mass, and 50\% farther from the Sun than the Earth, its climate has important similarities, such as the presence of polar ice caps, seasonal changes and observable weather patterns. It has attracted sustained study from planetologists and climatologists. While Mars' climate has similarities to Earth's, including periodic ice ages, there are also important differences, such as much lower thermal inertia. Mars' atmosphere has a scale height of approximately 11 km (36,000 ft), 60\% greater than that on Earth. The climate is of considerable relevance to the question of whether life is or was present on the planet. The climate briefly received more interest in the news due to NASA measurements indicating increased sublimation of one near-polar region leading to some popular press speculation that Mars was undergoing a parallel bout of global warming, although Mars' average temperature has actually cooled in recent decades, and the polar caps themselves are growing. Table \ref{tab:climate_mars} show the surface temperature range of planet Mars in different measuring scale.
-
-\begin{table}[ht]
-    \centering
-    \caption{Surface temperature range of planet Mars in different measuring scale.}
-    \begin{tabular}{l c c c} 
-        \hline
-        Surface temp. & min     & mean   & max   \\ \hline \hline
-        Kelvin        & 130 K   & 210 K  & 308 K \\ \hline
-        Celsius       & -143 $^{\circ}$C & -63 $^{\circ}$C & 35 $^{\circ}$C \\ \hline
-        Fahrenheit    & -226 $^{\circ}$F & -82 $^{\circ}$F & 95 $^{\circ}$F \\ \hline
-\end{tabular}
-    \label{tab:climate_mars}
-\end{table}
-
-
+These historical trends underline the urgent need for an intelligent, automated, and scalable traffic management system. With the emergence of AI and computer vision, there is now a feasible opportunity to transition from rule-based traffic control to data-driven decision-making systems that can respond in real time to ever-changing road conditions. This project is developed in response to these historical shortcomings and aims to bridge the gap between traditional systems and modern urban mobility demands.
