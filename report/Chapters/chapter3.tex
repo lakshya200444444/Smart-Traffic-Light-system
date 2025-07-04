@@ -1,28 +1,110 @@
 \chapter{Methodology}
 
-The methodology of this project involves several key steps to develop an effective AI-based traffic management system:
+This chapter outlines the systematic approach adopted to design, develop, and evaluate an AI-based traffic management system capable of monitoring and controlling traffic flow in real-time. The methodology includes the identification of the problem scope, system architecture design, data collection and preprocessing, AI model development, and system evaluation. Each phase has been carefully structured to ensure the feasibility, scalability, and effectiveness of the proposed solution.
+
+\section{System Overview}
+
+The primary objective of the proposed system is to dynamically manage traffic signal timing at an intersection using real-time traffic data. The methodology comprises three major components:
+
+\begin{itemize}
+    \item Vehicle detection using computer vision techniques.
+    \item Traffic data analysis and decision-making using machine learning.
+    \item Real-time traffic signal control based on intelligent predictions.
+\end{itemize}
+
+\section{Problem Definition and Scope}
+
+Urban intersections often face high traffic congestion due to inefficient signal timing. Traditional systems operate on fixed schedules without adapting to real-time conditions. This project addresses this limitation by proposing a smart, adaptive solution that uses live visual input to monitor traffic and optimize signal durations dynamically.
+
+The proposed system focuses on a single intersection with four approach roads (e.g., North, South, East, and West), each capable of being monitored individually. The framework can later be scaled to multi-intersection networks.
+
+\section{System Architecture}
+
+The system is composed of the following layers:
 
 \begin{enumerate}
-    \item \textbf{Data Collection}\\
-    Real-time traffic data will be collected using sensors, cameras, and GPS devices installed at various points in the traffic network. This data includes vehicle count, speed, congestion levels, and signal status.
-
-    \item \textbf{Data Preprocessing}\\
-    The collected raw data will be cleaned and organized to remove noise or errors. This step ensures that the AI algorithms receive accurate and relevant information for analysis.
-
-    \item \textbf{Traffic Analysis Using AI}\\
-    Machine learning models will be developed to analyze the traffic patterns based on the preprocessed data. These models will learn to detect congestion, predict traffic flow, and identify peak hours.
-
-    \item \textbf{Intelligent Signal Control}\\
-    The system will use the AI predictions to adjust traffic signal timings dynamically. This helps in reducing wait times and improving the overall flow of vehicles.
-
-    \item \textbf{Emergency Vehicle Prioritization}\\
-    The system will be designed to detect emergency vehicles and give them priority by adjusting signals accordingly to clear their path quickly.
-
-    \item \textbf{System Integration and Testing}\\
-    The components will be integrated into a working prototype. The system will be tested using simulated traffic scenarios to evaluate its performance and make improvements.
-
-    \item \textbf{Deployment and Monitoring}\\
-    After successful testing, the system can be deployed in a real traffic environment for continuous monitoring and further optimization based on feedback.
+    \item \textbf{Input Layer:} Video input from CCTV or recorded footage for vehicle detection.
+    \item \textbf{Processing Layer:} Computer vision and AI models for detecting vehicles and estimating density.
+    \item \textbf{Decision-Making Layer:} A traffic signal controller that selects the optimal green light direction and duration based on detected traffic.
+    \item \textbf{Output Layer:} A simulation interface or real-world signal controller that reflects the decisions made by the AI system.
 \end{enumerate}
 
+\section{Vehicle Detection using Computer Vision}
 
+A pre-trained object detection model is used to detect and classify vehicles from video frames. The following tools and models are used:
+
+\begin{itemize}
+    \item \textbf{Model:} YOLOv8 (You Only Look Once version 8), optimized and exported in ONNX format for performance.
+    \item \textbf{Runtime:} ONNX Runtime integrated into a Kotlin/Java-based GUI for desktop testing.
+    \item \textbf{Classes Detected:} Car, Truck, Bus, and Motorcycle.
+\end{itemize}
+
+Frames are extracted from video streams in real time, passed through the detection model, and vehicle counts per direction are aggregated. This data serves as input for the decision-making algorithm.
+
+\section{Traffic Flow Analysis and Decision Making}
+
+Once the vehicle count data is obtained, the system applies a rule-based or machine learning model to determine the optimal green light phase. Two strategies were explored:
+
+\subsection{Rule-Based Algorithm}
+
+A priority score is calculated for each direction using a simple formula:
+
+\[
+    \text{Priority}_{i} = \alpha \cdot \text{VehicleCount}_{i} + \beta \cdot \text{WaitTime}_{i}
+\]
+
+Where:
+\begin{itemize}
+    \item $\alpha$ and $\beta$ are weighting factors.
+    \item $i$ refers to a direction (e.g., North).
+    \item $\text{WaitTime}_{i}$ is the duration since that direction last had a green light.
+\end{itemize}
+
+The direction with the highest priority is granted the next green signal. This ensures both congestion and fairness are considered.
+
+\subsection{Machine Learning Model (Optional)}
+
+As an alternative, a lightweight decision tree model was trained using synthetic data generated from simulations. The features used were:
+\begin{itemize}
+    \item Vehicle count per direction
+    \item Average vehicle speed (if sensors are available)
+    \item Time since last green signal
+    \item Time of day
+\end{itemize}
+
+The model outputs a decision vector indicating the next green phase and its duration.
+
+\section{Simulation and Visualization}
+
+A desktop-based simulator was developed using Jetpack Compose Desktop and Kotlin Multiplatform to visualize the traffic intersection and signal changes in real-time. The system shows:
+\begin{itemize}
+    \item Real-time video input and detected vehicles
+    \item Dynamic updates to signal lights
+    \item Performance metrics (e.g., average wait time, throughput)
+\end{itemize}
+
+This environment was used for testing and validation before any real-world deployment.
+
+\section{Tools and Technologies}
+
+\begin{itemize}
+    \item \textbf{Programming Languages:} Kotlin, Python
+    \item \textbf{Libraries:} Jetpack Compose Desktop, OpenCV, ONNX Runtime, Scikit-learn (for ML training)
+    \item \textbf{Hardware:} M1 MacBook (for development and testing)
+    \item \textbf{Database (optional):} PostgreSQL for logging and analysis
+\end{itemize}
+
+\section{Evaluation Criteria}
+
+The performance of the system was evaluated using the following metrics:
+
+\begin{itemize}
+    \item \textbf{Vehicle Detection Accuracy:} Precision and recall of the detection model.
+    \item \textbf{Signal Timing Efficiency:} Average vehicle waiting time and throughput.
+    \item \textbf{Scalability:} System response time under high vehicle density.
+    \item \textbf{Flexibility:} Ability to prioritize emergency or high-density lanes.
+\end{itemize}
+
+\section{Summary}
+
+This methodology provides a comprehensive framework for developing an intelligent traffic management system. By integrating computer vision, real-time analysis, and adaptive control, the proposed system offers a significant improvement over traditional static signal systems. The modular design ensures that it can be extended to multiple intersections and enhanced with additional data sources in the future.
