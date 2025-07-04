@@ -21,10 +21,16 @@ jobs:
       - name: SSH into VM and deploy
         uses: appleboy/ssh-action@v1.0.0
         with:
-          host: 35.240.216.70                         # ✅ Your GCP VM external IP
-          username: sourav_0_alim                     # ✅ Your GCP VM username
-          key: ${{ secrets.SSH_PRIVATE_KEY }}         # ✅ Your private key with no passphrase
+          host: 35.240.216.70
+          username: sourav_0_alim
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
+            echo "📁 Checking project directory..."
+            if [ ! -d ~/Smart-Traffic-Management-System ]; then
+              echo "📥 Cloning project..."
+              git clone https://github.com/YOUR_USERNAME/Smart-Traffic-Management-System.git ~/Smart-Traffic-Management-System
+            fi
+
             echo "🔄 Navigating to project directory..."
             cd ~/Smart-Traffic-Management-System || exit 1
 
