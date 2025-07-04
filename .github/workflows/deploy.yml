@@ -28,7 +28,7 @@ jobs:
             echo "📁 Checking project directory..."
             if [ ! -d ~/Smart-Traffic-Management-System ]; then
               echo "📥 Cloning project..."
-              git clone https://github.com/YOUR_USERNAME/Smart-Traffic-Management-System.git ~/Smart-Traffic-Management-System
+              git clone https://github.com/Alims-Repo/Smart-Traffic-Management-System.git ~/Smart-Traffic-Management-System
             fi
 
             echo "🔄 Navigating to project directory..."
