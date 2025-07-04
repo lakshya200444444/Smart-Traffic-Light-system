@@ -35,7 +35,7 @@ jobs:
             cd ~/Smart-Traffic-Management-System || exit 1
 
             echo "📦 Pulling latest code..."
-            git pull origin main
+            git pull origin master
 
             echo "🧼 Cleaning old containers..."
             docker-compose down || true
