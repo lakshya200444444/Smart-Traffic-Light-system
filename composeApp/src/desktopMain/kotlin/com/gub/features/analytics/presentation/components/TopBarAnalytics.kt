@@ -118,8 +118,8 @@ fun TopBarAnalytics(
                         },
                         selected = filterOptions.timeRange == timeRange,
                         colors = FilterChipDefaults.filterChipColors(
-                            selectedContainerColor = Color(0xFF2E7D32),
-                            containerColor = Color(0xFF161B22)
+                            selectedContainerColor = MaterialTheme.colorScheme.primary,
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant
                         )
                     )
                 }

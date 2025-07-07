@@ -106,12 +106,12 @@ fun InteractiveTrafficVolumeChartCard(
                             trend = "+5.2%",
                             color = Color(0xFF4CAF50)
                         )
-                        MetricItem(
-                            label = "Avg Speed",
-                            value = "${metrics.data.averageSpeed.toInt()} km/h",
-                            trend = "-2.1%",
-                            color = Color(0xFFFF9800)
-                        )
+//                        MetricItem(
+//                            label = "Avg Speed",
+//                            value = "${metrics.data.averageSpeed.toInt()} km/h",
+//                            trend = "-2.1%",
+//                            color = Color(0xFFFF9800)
+//                        )
                         MetricItem(
                             label = "Congestion",
                             value = "${(metrics.data.congestionLevel * 100).toInt()}%",
