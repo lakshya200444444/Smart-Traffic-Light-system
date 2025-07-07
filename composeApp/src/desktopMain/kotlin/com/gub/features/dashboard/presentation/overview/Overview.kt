@@ -41,14 +41,14 @@ fun Overview(viewModelDashboard: ViewModelDashboard, hazeState: HazeState, top: 
             }
         }
 
-        item {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                RecentAlertsCard(modifier = Modifier.weight(1f))
-                TopPerformingIntersectionsCard(modifier = Modifier.weight(1f))
-            }
-        }
+//        item {
+//            Row(
+//                modifier = Modifier.fillMaxWidth(),
+//                horizontalArrangement = Arrangement.spacedBy(16.dp)
+//            ) {
+//                RecentAlertsCard(modifier = Modifier.weight(1f))
+//                TopPerformingIntersectionsCard(modifier = Modifier.weight(1f))
+//            }
+//        }
     }
 }

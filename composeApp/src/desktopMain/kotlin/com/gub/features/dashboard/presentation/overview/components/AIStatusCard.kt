@@ -102,14 +102,14 @@ fun AIStatusCard(modifier: Modifier = Modifier) {
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            AIStatusItem("Models Running", "12/12", Color(0xFF4CAF50))
-            AIStatusItem("Decision Speed", "0.28ms", Color(0xFF4CAF50))
-            AIStatusItem("Learning Rate", "97.8%", Color(0xFF2196F3))
+            AIStatusItem("Models Running", "3/3", Color(0xFF4CAF50))
+            AIStatusItem("Average Decision Speed", "167ms", Color(0xFF4CAF50))
+//            AIStatusItem("Learning Rate", "97.8%", Color(0xFF2196F3))
 
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                "Last optimization: 3 minutes ago",
+                "Last Update: 3 minutes ago",
                 color = MaterialTheme.colorScheme.onSurface.copy(0.75f),
                 fontSize = 10.sp,
                 style = androidx.compose.ui.text.TextStyle(

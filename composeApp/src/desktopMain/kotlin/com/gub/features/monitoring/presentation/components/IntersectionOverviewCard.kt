@@ -107,11 +107,8 @@ fun IntersectionOverviewCard(modifier: Modifier = Modifier) {
 
     Card(
         modifier = modifier,
-        colors = CardDefaults.cardColors(
-            containerColor = Color(0xFF0B1426)
-        ),
-        shape = RoundedCornerShape(20.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 12.dp)
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        shape = RoundedCornerShape(12.dp)
     ) {
         Column(
             modifier = Modifier.padding(24.dp)
@@ -173,14 +170,14 @@ private fun ModernHeader() {
                 Spacer(modifier = Modifier.width(12.dp))
                 Column {
                     Text(
-                        "Broadway & 42nd Street",
-                        color = Color.White,
+                        "Mirpur 10",
+                        color = MaterialTheme.colorScheme.onSurface,
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold
                     )
                     Text(
                         "Times Square District • User: Alims-Repo",
-                        color = Color(0xFF94A3B8),
+                        color = MaterialTheme.colorScheme.onSurface.copy(0.75F),
                         fontSize = 11.sp
                     )
                 }
@@ -250,8 +247,8 @@ private fun ViewSelector(selectedView: String, onViewChange: (String) -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .background(
-                Color(0xFF1F2937).copy(alpha = 0.5f),
-                RoundedCornerShape(12.dp)
+                color = MaterialTheme.colorScheme.surfaceVariant,
+                shape = RoundedCornerShape(12.dp)
             )
             .padding(4.dp),
         horizontalArrangement = Arrangement.spacedBy(4.dp)
@@ -279,8 +276,10 @@ private fun ViewSelector(selectedView: String, onViewChange: (String) -> Unit) {
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    view,
-                    color = if (isSelected) Color.White else Color(0xFF9CA3AF),
+                    text = view,
+                    color = if (selectedView == view)
+                        MaterialTheme.colorScheme.onPrimary
+                    else MaterialTheme.colorScheme.onSurface,
                     fontSize = 12.sp,
                     fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Medium
                 )
@@ -316,7 +315,7 @@ private fun LiveIntersectionView() {
         DynamicVehicleFlow()
 
         // Traffic Info Overlay
-        TrafficInfoOverlay()
+//        TrafficInfoOverlay()
     }
 }
 
@@ -787,9 +786,7 @@ private fun BoxScope.TrafficInfoOverlay() {
         modifier = Modifier
             .align(Alignment.Center)
             .size(60.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = Color.Black.copy(alpha = 0.85f)
-        ),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         shape = RoundedCornerShape(12.dp),
         border = BorderStroke(1.dp, Color(0xFF3B82F6).copy(alpha = 0.4f))
     ) {
@@ -1033,7 +1030,7 @@ private fun QuickMetric(
     Card(
         modifier = modifier,
         colors = CardDefaults.cardColors(
-            containerColor = Color(0xFF1F2937).copy(alpha = 0.6f)
+            containerColor = MaterialTheme.colorScheme.surfaceVariant
         ),
         shape = RoundedCornerShape(12.dp)
     ) {
@@ -1053,7 +1050,7 @@ private fun QuickMetric(
 
             Text(
                 value,
-                color = Color.White,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold
             )

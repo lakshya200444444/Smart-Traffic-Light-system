@@ -222,16 +222,15 @@ fun IntersectionSelectorCard(
     modifier: Modifier = Modifier
 ) {
     val intersections = listOf(
-        "Main St & 5th Ave",
-        "Park Rd & Oak St",
-        "1st Ave & Broadway",
-        "Highway 101 & Center St",
-        "Market St & Pine Ave"
+        "Begum Rokeya Ave & Mirpur Rd",
+        "Gulshan 1 & Gulshan 2",
+        "Bijoy Sarani & Pragati Sarani",
+        "Shahbagh & Nilkhet",
     )
 
     Card(
         modifier = modifier,
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF161B22)),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         shape = RoundedCornerShape(12.dp)
     ) {
         Column(
@@ -239,7 +238,7 @@ fun IntersectionSelectorCard(
         ) {
             Text(
                 "Select Intersection",
-                color = Color.White,
+                color = MaterialTheme.colorScheme.onSurface,
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold
             )
@@ -278,7 +277,7 @@ fun IntersectionItem(
             .fillMaxWidth()
             .clickable { onClick() },
         colors = CardDefaults.cardColors(
-            containerColor = if (isSelected) Color(0xFF2E7D32) else Color(0xFF0D1117)
+            containerColor = if (isSelected) Color(0xFF2E7D32) else MaterialTheme.colorScheme.surfaceVariant
         ),
         shape = RoundedCornerShape(6.dp)
     ) {
@@ -289,7 +288,7 @@ fun IntersectionItem(
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     name,
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Medium
                 )

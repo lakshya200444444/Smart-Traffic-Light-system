@@ -136,9 +136,9 @@ fun LiveTrafficMetricsCard(modifier: Modifier = Modifier) {
             Spacer(modifier = Modifier.height(16.dp))
 
             LiveMetricItem("Total Vehicle Count", "128,569", "+892 from last hour", true)
-            LiveMetricItem("Average Speed", "29.4 mph", "+1.2 mph improvement", true)
-            LiveMetricItem("Congestion Index", "23.7%", "-4.3% reduction", true)
-            LiveMetricItem("Signal Efficiency", "95.3%", "+2.1% optimization", true)
+//            LiveMetricItem("Average Speed", "29.4 mph", "+1.2 mph improvement", true)
+            LiveMetricItem("Congestion Index", "83.7%", "-4.3% reduction", true)
+//            LiveMetricItem("Signal Efficiency", "95.3%", "+2.1% optimization", true)
 
             Spacer(modifier = Modifier.height(12.dp))
 
@@ -158,7 +158,7 @@ fun LiveTrafficMetricsCard(modifier: Modifier = Modifier) {
                         fontSize = 11.sp
                     )
                     Text(
-                        "18:15 (High volume expected)",
+                        "17:15 (High volume expected)",
                         color = Color(0xFF2196F3),
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Medium
