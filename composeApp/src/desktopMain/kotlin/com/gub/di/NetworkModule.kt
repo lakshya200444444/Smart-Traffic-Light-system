@@ -1,6 +1,6 @@
 package com.gub.di
 
-import com.gub.app.Const.BASE_URL
+import com.gub.app.Const.SERVER_URL
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.DefaultRequest
@@ -33,7 +33,7 @@ object NetworkModule {
             }
 
             install(DefaultRequest) {
-                url("http://$BASE_URL/") // Default server URL
+                url("http://$SERVER_URL/") // Default server URL
                 headers.append("Content-Type", "application/json")
                 headers.append("Accept", "application/json")
             }

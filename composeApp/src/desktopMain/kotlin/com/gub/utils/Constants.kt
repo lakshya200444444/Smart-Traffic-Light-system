@@ -7,11 +7,11 @@ package com.gub.utils
 
 object Constants {
     // Network configuration
-    const val DEFAULT_SERVER_HOST = "localhost"
-//    const val DEFAULT_SERVER_HOST = "35.240.216.70"
-    const val DEFAULT_SERVER_PORT = 1234
-    const val DEFAULT_SERVER_URL = "http://$DEFAULT_SERVER_HOST:$DEFAULT_SERVER_PORT"
-    const val DEFAULT_WEBSOCKET_URL = "ws://$DEFAULT_SERVER_HOST:$DEFAULT_SERVER_PORT/ws"
+//    const val DEFAULT_SERVER_HOST = "localhost"
+////    const val DEFAULT_SERVER_HOST = "35.240.216.70"
+//    const val DEFAULT_SERVER_PORT = 1234
+//    const val DEFAULT_SERVER_URL = "http://$DEFAULT_SERVER_HOST:$DEFAULT_SERVER_PORT"
+//    const val DEFAULT_WEBSOCKET_URL = "ws://$DEFAULT_SERVER_HOST:$DEFAULT_SERVER_PORT/ws"
 
     // API endpoints
     const val ENDPOINT_HEALTH = "/health"
