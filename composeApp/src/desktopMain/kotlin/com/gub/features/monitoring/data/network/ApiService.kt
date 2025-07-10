@@ -5,6 +5,7 @@
  */
 package com.gub.features.monitoring.data.network
 
+import com.gub.app.Const.STREAM_URL
 import com.gub.features.monitoring.domain.model.BroadcastControlRequest
 import com.gub.features.monitoring.domain.model.ConfigUpdateRequest
 import com.gub.features.monitoring.domain.model.ConfigurationStats
@@ -27,7 +28,7 @@ import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
 
 class ApiService(
-    private val baseUrl: String = Constants.DEFAULT_SERVER_URL
+    private val baseUrl: String = STREAM_URL
 ) {
     private val client = HttpClient(CIO) {
         install(ContentNegotiation) {

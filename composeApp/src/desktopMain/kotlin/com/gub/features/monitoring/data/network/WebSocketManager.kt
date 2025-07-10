@@ -6,6 +6,7 @@ package com.gub.features.monitoring.data.network
  * Date: 2025-06-17
  */
 import com.google.gson.Gson
+import com.gub.app.Const.STREAM_WEBSOCKET_URL
 import com.gub.features.monitoring.domain.model.DetectionResponse
 import com.gub.features.monitoring.domain.model.WebSocketCommand
 import com.gub.utils.Constants
@@ -21,7 +22,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flow
 
 class WebSocketManager(
-    private val url: String = Constants.DEFAULT_WEBSOCKET_URL
+    private val url: String = STREAM_WEBSOCKET_URL
 ) {
     private val client = HttpClient(CIO) {
         install(WebSockets) {
