@@ -8,7 +8,7 @@ class RepositoryDashboardImpl(
     private val systemOverviewService: SystemOverviewService
 ) : RepositoryDashboard {
 
-    override fun getSystemOverview(): ModelSystemOverview {
+    override suspend fun getSystemOverview(): ModelSystemOverview {
         return systemOverviewService.systemOverview()
     }
 

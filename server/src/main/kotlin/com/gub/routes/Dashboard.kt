@@ -7,6 +7,7 @@ import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
 import io.ktor.server.routing.route
+import kotlinx.coroutines.delay
 import org.koin.ktor.ext.inject
 
 fun Route.dashboardRoute() {

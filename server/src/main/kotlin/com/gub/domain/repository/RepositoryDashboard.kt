@@ -6,7 +6,7 @@ import com.gub.domain.models.dashboard.ModelSystemOverview
 
 interface RepositoryDashboard {
 
-    fun getSystemOverview(): ModelSystemOverview
+    suspend fun getSystemOverview(): ModelSystemOverview
 
     fun getLiveTrafficMetrics(): ModelLiveTraffic
 
