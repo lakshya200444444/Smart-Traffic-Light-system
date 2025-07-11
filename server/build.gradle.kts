@@ -32,6 +32,8 @@ dependencies {
     implementation("org.jetbrains.exposed:exposed-jdbc:0.50.1")
     implementation("org.postgresql:postgresql:42.7.3")
 
+    implementation("org.dizitart:nitrite:4.0.0") // Nitrite NoSQL DB
+
     implementation("org.jetbrains.exposed:exposed-java-time:0.50.1")
 
     // Database drivers

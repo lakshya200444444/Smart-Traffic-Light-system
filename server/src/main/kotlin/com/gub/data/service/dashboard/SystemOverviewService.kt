@@ -25,8 +25,6 @@ class SystemOverviewService(
         )
     }
 
-
-
     @Suppress("DefaultLocale")
     private fun calculateSystemHealth(): Double {
         // Memory usage
