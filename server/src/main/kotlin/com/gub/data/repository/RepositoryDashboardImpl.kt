@@ -1,11 +1,13 @@
 package com.gub.data.repository
 
+import com.gub.data.service.dashboard.ServiceTrafficMeasure
 import com.gub.data.service.dashboard.SystemOverviewService
 import com.gub.domain.models.dashboard.*
 import com.gub.domain.repository.RepositoryDashboard
 
 class RepositoryDashboardImpl(
-    private val systemOverviewService: SystemOverviewService
+    private val systemOverviewService: SystemOverviewService,
+    private val serviceTrafficMeasure: ServiceTrafficMeasure
 ) : RepositoryDashboard {
 
     override suspend fun getSystemOverview(): ModelSystemOverview {
@@ -13,7 +15,7 @@ class RepositoryDashboardImpl(
     }
 
     override fun getLiveTrafficMetrics(): ModelLiveTraffic {
-        return ModelLiveTraffic()
+        return serviceTrafficMeasure.getLiveTrafficSummary()
     }
 
     override fun getAiControlSystem(): ModelAiControl {

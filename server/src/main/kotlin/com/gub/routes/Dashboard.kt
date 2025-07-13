@@ -1,6 +1,7 @@
 package com.gub.routes
 
 import com.gub.data.repository.RepositoryDashboardImpl
+import com.gub.domain.usecase.dashboard.UseCaseLiveTraffic
 import com.gub.domain.usecase.dashboard.UseCaseSystemOverview
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.response.respond
@@ -12,6 +13,7 @@ import org.koin.ktor.ext.inject
 
 fun Route.dashboardRoute() {
 
+    val liveTraffic by inject<UseCaseLiveTraffic>()
     val systemOverview by inject<UseCaseSystemOverview>()
 
     route("/api/dashboard") {
@@ -21,10 +23,9 @@ fun Route.dashboardRoute() {
 //            call.respond(HttpStatusCode.OK, result)
 //        }
 //
-//        get("/traffic") {
-//            val result = repositoryDashboard.getLiveTrafficMetrics()
-//            call.respond(HttpStatusCode.OK, result)
-//        }
+        get("/traffic") {
+            call.respond(HttpStatusCode.OK, liveTraffic())
+        }
 
         get("/system") {
             call.respond(HttpStatusCode.OK, systemOverview())

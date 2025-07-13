@@ -2,6 +2,7 @@ package com.gub.features.dashboard.domain.repository
 
 
 import com.gub.core.domain.Response
+import com.gub.domain.models.dashboard.ModelLiveTraffic
 import com.gub.models.dashboard.overview.ModelSystemOverview
 import kotlinx.coroutines.flow.Flow
 
@@ -11,5 +12,5 @@ interface SystemOverviewRepository {
 
     fun getSystemOverviewStream(): Flow<ModelSystemOverview>
 
-    suspend fun updateSystemMetrics(overview: ModelSystemOverview): Result<Unit>
+    suspend fun getTrafficMatrics(): Response<ModelLiveTraffic>
 }

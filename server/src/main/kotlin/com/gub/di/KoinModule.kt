@@ -8,8 +8,10 @@ import com.gub.data.database.daoImpl.TrafficStatsDaoImpl
 import com.gub.data.database.daoImpl.WeatherDaoImpl
 import com.gub.data.repository.RepositoryDashboardImpl
 import com.gub.data.service.common.WeatherService
+import com.gub.data.service.dashboard.ServiceTrafficMeasure
 import com.gub.data.service.dashboard.SystemOverviewService
 import com.gub.domain.repository.RepositoryDashboard
+import com.gub.domain.usecase.dashboard.UseCaseLiveTraffic
 import com.gub.domain.usecase.dashboard.UseCaseSystemOverview
 import io.ktor.client.plugins.websocket.WebSockets
 import org.koin.dsl.module
@@ -22,11 +24,13 @@ val dashboardModule = module {
 
     // Services
     single { WeatherService(get()) }
+    single { ServiceTrafficMeasure(get(), get()) }
     single { SystemOverviewService(get(), get(), get()) }
 
     // Repository
-    single { RepositoryDashboardImpl(get()) as RepositoryDashboard }
+    single { RepositoryDashboardImpl(get(), get()) as RepositoryDashboard }
 
     // Use Cases
+    single { UseCaseLiveTraffic(get()) }
     single { UseCaseSystemOverview(get()) }
 }

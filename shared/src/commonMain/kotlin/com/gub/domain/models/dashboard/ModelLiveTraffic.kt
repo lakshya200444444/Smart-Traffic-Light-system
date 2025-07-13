@@ -11,14 +11,14 @@ data class ModelLiveTraffic(
     @Serializable
     data class Vehicle(
         val count: Int = 0,
-        val difference: Int = 0,
+        val difference: Double = 0.0,
         val upWards: Boolean = true
     )
 
     @Serializable
     data class Congestion(
-        val count: Int = 0,
-        val difference: Int = 0,
+        val count: Double = 0.0,
+        val difference: Double = 0.0,
         val upWards: Boolean = true
     )
 }

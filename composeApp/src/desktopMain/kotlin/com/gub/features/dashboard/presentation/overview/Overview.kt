@@ -9,8 +9,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.gub.features.dashboard.presentation.LiveTrafficMetricsCard
 import com.gub.features.dashboard.presentation.overview.components.AIStatusCard
-import com.gub.features.dashboard.presentation.overview.components.RecentAlertsCard
-import com.gub.features.dashboard.presentation.overview.components.TopPerformingIntersectionsCard
 import com.gub.features.dashboard.presentation.overview.components.SystemOverviewCard
 import com.gub.features.dashboard.viewmodel.ViewModelDashboard
 import dev.chrisbanes.haze.HazeState
@@ -36,7 +34,10 @@ fun Overview(viewModelDashboard: ViewModelDashboard, hazeState: HazeState, top: 
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                LiveTrafficMetricsCard(modifier = Modifier.weight(1f))
+                LiveTrafficMetricsCard(
+                    modifier = Modifier.weight(1f),
+                    systemOverview.value.liveTrafficMatrics
+                )
                 AIStatusCard(modifier = Modifier.weight(1f))
             }
         }

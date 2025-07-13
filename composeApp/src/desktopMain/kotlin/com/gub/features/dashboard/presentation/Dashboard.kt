@@ -19,6 +19,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.gub.domain.models.dashboard.ModelLiveTraffic
 import com.gub.features.dashboard.presentation.components.TopBarDashboard
 import com.gub.features.dashboard.presentation.insights.UserInsightsDashboardCard
 import com.gub.features.dashboard.presentation.liveStatus.LiveStatus
@@ -99,7 +100,7 @@ fun SystemOverviewMetric(
 }
 
 @Composable
-fun LiveTrafficMetricsCard(modifier: Modifier = Modifier) {
+fun LiveTrafficMetricsCard(modifier: Modifier = Modifier, liveTrafficMatrics: ModelLiveTraffic) {
     Card(
         modifier = modifier,
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
@@ -135,9 +136,22 @@ fun LiveTrafficMetricsCard(modifier: Modifier = Modifier) {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            LiveMetricItem("Total Vehicle Count", "128,569", "+892 from last hour", true)
+            LiveMetricItem(
+                label = "Total Vehicle Count",
+                value = liveTrafficMatrics.vehicle.count.toString(),
+                change = liveTrafficMatrics.vehicle.difference.toString(),
+                positive = liveTrafficMatrics.vehicle.upWards
+            )
 //            LiveMetricItem("Average Speed", "29.4 mph", "+1.2 mph improvement", true)
-            LiveMetricItem("Congestion Index", "83.7%", "-4.3% reduction", true)
+            LiveMetricItem(
+                label = "Congestion Index",
+                value = liveTrafficMatrics.congestion.count.toString(),
+                change = liveTrafficMatrics.congestion.difference.toString(),
+                positive = liveTrafficMatrics.congestion.upWards
+            )
+
+            print("DATA - > ${liveTrafficMatrics}")
+
 //            LiveMetricItem("Signal Efficiency", "95.3%", "+2.1% optimization", true)
 
             Spacer(modifier = Modifier.height(12.dp))
@@ -186,7 +200,7 @@ fun LiveMetricItem(label: String, value: String, change: String, positive: Boole
             )
             Text(
                 value,
-                color = Color.White,
+                color = MaterialTheme.colorScheme.onSurface,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Bold
             )
