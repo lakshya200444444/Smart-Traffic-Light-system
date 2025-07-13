@@ -3,6 +3,7 @@ package com.gub.data.service.common
 import com.gub.application.Config.API_KEY
 import com.gub.application.Config.OPEN_WEATHER
 import com.gub.data.database.dao.WeatherDao
+import com.gub.data.database.entity.WeatherData
 import com.gub.data.database.entity.WeatherData.Companion.toWeatherData
 import com.gub.models.dashboard.overview.ModelWeather
 import io.ktor.client.*
@@ -25,6 +26,11 @@ class WeatherService(
     private val defaultCountryCode: String = "BD"
 ) {
 
+    companion object {
+        private var lastLoad: Long = 0
+        private var lastWeather: ModelWeather? = null
+    }
+
     private val logger = LoggerFactory.getLogger(WeatherService::class.java)
 
     private val httpClient = HttpClient(CIO) {
@@ -40,6 +46,10 @@ class WeatherService(
         city: String = defaultCity,
         countryCode: String = defaultCountryCode
     ): ModelWeather = withContext(Dispatchers.IO) {
+        if (lastLoad >= (System.currentTimeMillis() - 60 * 60 * 1000)) {
+            if (lastWeather != null)
+                return@withContext lastWeather!!
+        }
         try {
             val response = httpClient.get(OPEN_WEATHER) {
                 parameter("q", "$city,$countryCode")
@@ -56,6 +66,8 @@ class WeatherService(
                 humidity = weatherData.main.humidity.toDouble(),
                 visibility = (weatherData.visibility ?: 10000) / 1000.0 // Convert meters to kilometers
             ).also {
+                lastWeather = it
+                lastLoad = System.currentTimeMillis()
                 weatherDao.insert(it.toWeatherData())
             }
         } catch (e: Exception) {

@@ -9,7 +9,7 @@ class SignalDaoImpl : SignalDao {
 
     private val map = DatabaseFactory.db
         .hashMap(
-            "traffic_stats",
+            "signal_data",
             org.mapdb.Serializer.STRING,
             org.mapdb.Serializer.JAVA
         ).createOrOpen() as MutableMap<String, SignalData>

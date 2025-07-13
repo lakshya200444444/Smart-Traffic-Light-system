@@ -1,5 +1,6 @@
 package com.gub.data.database.entity
 
+import java.io.Serializable
 import java.time.Instant
 import java.util.UUID
 
@@ -8,7 +9,7 @@ data class SignalData(
     val timestamp: Instant = Instant.now(),
     val roadId: String,
     val signalState: SignalState,
-) {
+) : Serializable {
 
     enum class SignalState {
         RED,

@@ -91,13 +91,13 @@ class SystemOverviewService(
             }
         }
 
-        return if (redCount == 0) 0.0 else totalWaitTimeSeconds.toDouble() / redCount
+        return if (redCount == 0) 0.0 else (totalWaitTimeSeconds.toDouble() / redCount) / 60
     }
 
     // Calculates recent vehicle flow rate (vehicles per minute)
     fun getCurrentTrafficFlowRate(): Double {
         val now = Instant.now()
-        val recentStats = trafficStatsDao.getRecentWithin(60) // last 60 seconds
+        val recentStats = trafficStatsDao.getAll()
 
         if (recentStats.isEmpty()) return 0.0
 
