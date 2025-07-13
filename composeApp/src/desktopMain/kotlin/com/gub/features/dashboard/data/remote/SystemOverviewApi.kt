@@ -16,11 +16,11 @@ class SystemOverviewApiImpl(
 ) : SystemOverviewApi {
 
     override suspend fun getSystemOverview(): ModelSystemOverview {
-        return httpClient.get("/api/system/overview").body()
+        return httpClient.get("/api/dashboard/system").body()
     }
 
     override suspend fun updateSystemOverview(overview: ModelSystemOverview) {
-        httpClient.post("/api/system/overview") {
+        httpClient.post("/api/dashboard/system") {
             contentType(ContentType.Application.Json)
             setBody(overview)
         }

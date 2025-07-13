@@ -1,6 +1,9 @@
 package com.gub.data.service.common
 
 import com.gub.application.Config.API_KEY
+import com.gub.application.Config.OPEN_WEATHER
+import com.gub.data.database.dao.WeatherDao
+import com.gub.data.database.entity.WeatherData.Companion.toWeatherData
 import com.gub.models.dashboard.overview.ModelWeather
 import io.ktor.client.*
 import io.ktor.client.call.*
@@ -17,9 +20,11 @@ import org.slf4j.LoggerFactory
 import kotlin.random.Random
 
 class WeatherService(
+    private val weatherDao: WeatherDao,
     private val defaultCity: String = "Dhaka",
     private val defaultCountryCode: String = "BD"
 ) {
+
     private val logger = LoggerFactory.getLogger(WeatherService::class.java)
 
     private val httpClient = HttpClient(CIO) {
@@ -36,7 +41,7 @@ class WeatherService(
         countryCode: String = defaultCountryCode
     ): ModelWeather = withContext(Dispatchers.IO) {
         try {
-            val response = httpClient.get("https://api.openweathermap.org/data/2.5/weather") {
+            val response = httpClient.get(OPEN_WEATHER) {
                 parameter("q", "$city,$countryCode")
                 parameter("appid", API_KEY)
                 parameter("units", "metric") // Get temperature in Celsius
@@ -50,7 +55,9 @@ class WeatherService(
                 wind = weatherData.wind?.speed ?: 0.0,
                 humidity = weatherData.main.humidity.toDouble(),
                 visibility = (weatherData.visibility ?: 10000) / 1000.0 // Convert meters to kilometers
-            )
+            ).also {
+                weatherDao.insert(it.toWeatherData())
+            }
         } catch (e: Exception) {
             logger.error("Failed to fetch weather data: ${e.message}", e)
             getFallbackWeather()
@@ -62,7 +69,7 @@ class WeatherService(
         lon: Double
     ): ModelWeather = withContext(Dispatchers.IO) {
         try {
-            val response = httpClient.get("https://api.openweathermap.org/data/2.5/weather") {
+            val response = httpClient.get(OPEN_WEATHER) {
                 parameter("lat", lat)
                 parameter("lon", lon)
                 parameter("appid", API_KEY)

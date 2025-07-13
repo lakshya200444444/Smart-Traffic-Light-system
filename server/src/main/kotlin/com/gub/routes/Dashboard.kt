@@ -12,8 +12,6 @@ import org.koin.ktor.ext.inject
 
 fun Route.dashboardRoute() {
 
-//    val repositoryDashboard by inject<RepositoryDashboardImpl>()
-
     val systemOverview by inject<UseCaseSystemOverview>()
 
     route("/api/dashboard") {

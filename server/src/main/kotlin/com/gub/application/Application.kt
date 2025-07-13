@@ -1,7 +1,6 @@
 package com.gub.application
 
 import com.gub.SERVER_PORT
-import com.gub.data.database.DatabaseConfig
 import com.gub.di.dashboardModule
 import com.gub.routes.dashboardRoute
 import io.ktor.serialization.kotlinx.json.json
@@ -24,20 +23,9 @@ fun main() {
     ).start(wait = true)
 }
 
-//fun Application.module() {
-//    install(WebSockets)
-//    install(ContentNegotiation) {
-//        json()
-//    }
-//
-//    routing {
-//        dashboardRoute()
-//    }
-//}
-
 fun Application.module() {
     // Initialize database
-    DatabaseConfig.init()
+//    DatabaseConfig.init()
 
     // Websocket
     install(WebSockets)

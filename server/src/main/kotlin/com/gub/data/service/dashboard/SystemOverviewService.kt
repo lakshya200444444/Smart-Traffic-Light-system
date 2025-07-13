@@ -1,26 +1,33 @@
 package com.gub.data.service.dashboard
 
+import com.gub.data.database.dao.SignalDao
+import com.gub.data.database.dao.TrafficStatsDao
+import com.gub.data.database.entity.SignalData
+import com.gub.data.database.entity.TrafficStats
 import com.gub.data.service.common.WeatherService
 import com.gub.domain.models.dashboard.ModelSystemOverview
 import com.gub.models.dashboard.overview.ModelWeather
 import java.lang.management.ManagementFactory
 import java.io.File
 import com.sun.management.OperatingSystemMXBean
+import java.io.Serializable
+import java.time.Duration
+import java.time.Instant
+import java.util.UUID
 
 class SystemOverviewService(
+    private val signalDao: SignalDao,
+    private val trafficStatsDao: TrafficStatsDao,
     private val weatherService: WeatherService,
 ) {
 
     suspend fun systemOverview(): ModelSystemOverview {
-        val aiResponseTime = getLastAIResponseTime()
-        val avgWaitTime = getAverageVehicleWaitTime()
-        val currentFlow = getCurrentTrafficFlowRate()
 
         return ModelSystemOverview(
             systemHealth = calculateSystemHealth(),
-            aiResponseTime = aiResponseTime,
-            avgWaitTime = avgWaitTime,
-            currentFlow = currentFlow,
+            aiResponseTime = getLastAIResponseTime(),
+            avgWaitTime = getAverageVehicleWaitTime(),
+            currentFlow = getCurrentTrafficFlowRate(),
             weather = weatherService.getCurrentWeather()
         )
     }
@@ -56,17 +63,49 @@ class SystemOverviewService(
         return String.format("%.2f", healthScore).toDouble()  // Round to 2 decimal places
     }
 
+    // TODO: Implement real AI response time tracking
     private fun getLastAIResponseTime(): Double {
         return (80..150).random().toDouble()
     }
 
-    private fun getAverageVehicleWaitTime(): Double {
-        // Simulated: could be based on traffic queue logs
-        return (10..90).random().toDouble()
+    // Calculates average wait time during RED signals (in seconds)
+    fun getAverageVehicleWaitTime(): Double {
+        val redSignals = signalDao.getAll().filter { it.signalState == SignalData.SignalState.RED }
+
+        if (redSignals.isEmpty()) return 0.0
+
+        // Sort by timestamp for accurate duration calculation
+        val sorted = redSignals.sortedBy { it.timestamp }
+
+        var totalWaitTimeSeconds = 0L
+        var redCount = 0
+
+        for (i in 1 until sorted.size) {
+            val prev = sorted[i - 1]
+            val curr = sorted[i]
+
+            if (curr.roadId == prev.roadId) {
+                val duration = Duration.between(prev.timestamp, curr.timestamp).seconds
+                totalWaitTimeSeconds += duration
+                redCount++
+            }
+        }
+
+        return if (redCount == 0) 0.0 else totalWaitTimeSeconds.toDouble() / redCount
     }
 
-    private fun getCurrentTrafficFlowRate(): Double {
-        // Simulated: vehicles per minute
-        return (50..200).random().toDouble()
+    // Calculates recent vehicle flow rate (vehicles per minute)
+    fun getCurrentTrafficFlowRate(): Double {
+        val now = Instant.now()
+        val recentStats = trafficStatsDao.getRecentWithin(60) // last 60 seconds
+
+        if (recentStats.isEmpty()) return 0.0
+
+        val totalVehicles = recentStats.sumOf { it.vehicleCount }
+        val earliestTimestamp = recentStats.minOf { it.timestamp }
+        val durationSeconds = Duration.between(earliestTimestamp, now).seconds.coerceAtLeast(1)
+
+        val flowRatePerMinute = (totalVehicles.toDouble() / durationSeconds) * 60.0
+        return flowRatePerMinute
     }
 }
