@@ -3,7 +3,6 @@ package com.gub.data.service.common
 import com.gub.application.Config.API_KEY
 import com.gub.application.Config.OPEN_WEATHER
 import com.gub.data.database.dao.WeatherDao
-import com.gub.data.database.entity.WeatherData
 import com.gub.data.database.entity.WeatherData.Companion.toWeatherData
 import com.gub.models.dashboard.overview.ModelWeather
 import io.ktor.client.*

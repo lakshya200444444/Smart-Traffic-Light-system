@@ -1,14 +1,10 @@
 package com.gub.routes
 
-import com.gub.data.repository.RepositoryDashboardImpl
 import com.gub.domain.usecase.dashboard.UseCaseLiveTraffic
 import com.gub.domain.usecase.dashboard.UseCaseSystemOverview
-import io.ktor.http.HttpStatusCode
-import io.ktor.server.response.respond
-import io.ktor.server.routing.Route
-import io.ktor.server.routing.get
-import io.ktor.server.routing.route
-import kotlinx.coroutines.delay
+import io.ktor.http.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
 import org.koin.ktor.ext.inject
 
 fun Route.dashboardRoute() {

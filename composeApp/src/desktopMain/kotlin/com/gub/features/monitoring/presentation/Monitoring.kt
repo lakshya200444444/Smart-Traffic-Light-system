@@ -1,6 +1,5 @@
 package com.gub.features.monitoring.presentation
 
-import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
@@ -21,8 +20,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.gub.core.ui.components.PulsingDot
-import com.gub.features.dashboard.presentation.components.TopBarDashboard
 import com.gub.features.monitoring.presentation.components.IntersectionOverviewCard
 import com.gub.features.monitoring.presentation.components.LiveCameraFeedCard
 import com.gub.features.monitoring.presentation.components.TopBarMonitoring

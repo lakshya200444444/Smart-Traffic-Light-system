@@ -2,7 +2,9 @@ package com.gub.data.repository
 
 import com.gub.data.service.dashboard.ServiceTrafficMeasure
 import com.gub.data.service.dashboard.SystemOverviewService
-import com.gub.domain.models.dashboard.*
+import com.gub.domain.models.dashboard.ModelAiControl
+import com.gub.domain.models.dashboard.ModelLiveTraffic
+import com.gub.domain.models.dashboard.ModelSystemOverview
 import com.gub.domain.repository.RepositoryDashboard
 
 class RepositoryDashboardImpl(

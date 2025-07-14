@@ -3,17 +3,13 @@ package com.gub.data.service.dashboard
 import com.gub.data.database.dao.SignalDao
 import com.gub.data.database.dao.TrafficStatsDao
 import com.gub.data.database.entity.SignalData
-import com.gub.data.database.entity.TrafficStats
 import com.gub.data.service.common.WeatherService
 import com.gub.domain.models.dashboard.ModelSystemOverview
-import com.gub.models.dashboard.overview.ModelWeather
-import java.lang.management.ManagementFactory
-import java.io.File
 import com.sun.management.OperatingSystemMXBean
-import java.io.Serializable
+import java.io.File
+import java.lang.management.ManagementFactory
 import java.time.Duration
 import java.time.Instant
-import java.util.UUID
 
 class SystemOverviewService(
     private val signalDao: SignalDao,

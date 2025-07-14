@@ -1,7 +1,7 @@
 package com.gub.features.dashboard.domain.extension
 
 import com.gub.models.dashboard.overview.ModelSystemOverview
-import java.util.Locale
+import java.util.*
 
 fun ModelSystemOverview.systemHealthValue() = "${String.format(Locale.US, "%.1f", this.systemHealth)}%"
 

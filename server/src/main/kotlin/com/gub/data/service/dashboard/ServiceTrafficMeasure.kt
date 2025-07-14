@@ -1,10 +1,8 @@
 package com.gub.data.service.dashboard
 
-import com.gub.data.database.dao.TrafficStatsDao
 import com.gub.data.database.dao.SignalDao
+import com.gub.data.database.dao.TrafficStatsDao
 import com.gub.domain.models.dashboard.ModelLiveTraffic
-import java.time.ZoneOffset
-import java.time.ZonedDateTime
 import kotlin.math.abs
 
 class ServiceTrafficMeasure(

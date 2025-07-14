@@ -2,10 +2,6 @@ package com.gub.data.database
 
 import com.gub.data.database.daoImpl.SignalDaoImpl
 import com.gub.data.database.daoImpl.TrafficStatsDaoImpl
-import org.mapdb.DB
-import org.mapdb.DBMaker
-import java.io.File
-
 import com.gub.data.database.entity.SignalData
 import com.gub.data.database.entity.SignalData.SignalState
 import com.gub.data.database.entity.TrafficStats
@@ -13,8 +9,11 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.mapdb.DB
+import org.mapdb.DBMaker
+import java.io.File
 import java.time.Instant
-import java.util.UUID
+import java.util.*
 import kotlin.random.Random
 
 object DatabaseFactory {

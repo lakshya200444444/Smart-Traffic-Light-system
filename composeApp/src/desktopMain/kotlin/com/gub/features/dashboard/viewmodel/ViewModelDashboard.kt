@@ -2,7 +2,6 @@ package com.gub.features.dashboard.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import ch.qos.logback.core.model.Model
 import com.gub.core.domain.Response
 import com.gub.domain.models.dashboard.ModelLiveTraffic
 import com.gub.features.dashboard.di.DashboardModule

@@ -1,6 +1,5 @@
 package com.alim
 
-import android.util.Base64
 import okhttp3.*
 import okio.ByteString
 import java.util.concurrent.TimeUnit

@@ -4,12 +4,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.gub.core.domain.Response
 import com.gub.features.analytics.domain.model.*
-import com.gub.models.analytics.*
+import com.gub.models.analytics.ModelPrediction
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.*
 import kotlin.random.Random
 
 class ViewModelAnalytics : ViewModel() {

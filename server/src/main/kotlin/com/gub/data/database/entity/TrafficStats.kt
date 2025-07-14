@@ -2,7 +2,7 @@ package com.gub.data.database.entity
 
 import java.io.Serializable
 import java.time.Instant
-import java.util.UUID
+import java.util.*
 
 data class TrafficStats(
     val id: String = UUID.randomUUID().toString(),
