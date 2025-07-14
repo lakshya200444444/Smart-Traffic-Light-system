@@ -39,26 +39,6 @@ fun Monitoring() {
 
     val viewModelMonitoring = remember { ViewModelMonitoring() }
 
-//    AnimatedContent(
-//        targetState = isCameraExpanded
-//    ) {
-//        if (it) {
-//            if (isCameraExpanded)
-//                // Full width camera feed when expanded
-//                LiveCameraFeedCard(
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .animateContentSize(
-//                            animationSpec = tween(300)
-//                        ),
-//                    isExpanded = true,
-//                    onToggleExpand = { isCameraExpanded = !isCameraExpanded }
-//                )
-//        } else {
-//
-//        }
-//    }
-
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()

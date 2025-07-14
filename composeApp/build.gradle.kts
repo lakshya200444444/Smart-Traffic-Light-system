@@ -89,6 +89,13 @@ kotlin {
             implementation("org.openjfx:javafx-web:19")
             implementation("org.openjfx:javafx-swing:19")
 
+            // Open CV
+            implementation("org.bytedeco:javacv:1.5.8")
+            implementation("org.bytedeco:ffmpeg:4.5-1.5.8")
+            implementation("org.bytedeco:javacv-platform:1.5.12")
+//            implementation("org.bytedeco:ffmpeg-platform:4.5-1.5.8")
+
+
             // WebSocket client
             implementation("org.java-websocket:Java-WebSocket:1.5.3")
 

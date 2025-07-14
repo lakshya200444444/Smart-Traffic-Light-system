@@ -54,7 +54,7 @@ fun IntersectionOverviewCard(
             Spacer(modifier = Modifier.height(20.dp))
 
             // View Selector
-            ViewSelector(selectedView) { selectedView = it }
+//            ViewSelector(selectedView) { selectedView = it }
 
             Spacer(modifier = Modifier.height(24.dp))
 
@@ -164,20 +164,6 @@ private fun StatusBadge() {
                 fontWeight = FontWeight.Bold,
                 letterSpacing = 0.5.sp
             )
-//            Column {
-//                Text(
-//                    "ACTIVE",
-//                    color = Color(0xFF10B981),
-//                    fontSize = 10.sp,
-//                    fontWeight = FontWeight.Bold,
-//                    letterSpacing = 0.5.sp
-//                )
-//                Text(
-//                    "2025-06-23 09:18:36",
-//                    color = Color(0xFF6B7280),
-//                    fontSize = 8.sp
-//                )
-//            }
         }
     }
 }

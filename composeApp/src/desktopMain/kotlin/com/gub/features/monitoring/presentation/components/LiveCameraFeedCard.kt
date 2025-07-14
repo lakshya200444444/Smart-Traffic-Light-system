@@ -162,6 +162,7 @@ fun LiveCameraFeedCard(
     onToggleExpand: () -> Unit = {}
 ) {
     val webSocketManager by remember { mutableStateOf(WebSocketManager()) }
+
     val repository by remember {
         mutableStateOf(
             VehicleDetectionRepository(
