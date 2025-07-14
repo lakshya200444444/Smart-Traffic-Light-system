@@ -6,14 +6,17 @@ import com.gub.data.database.dao.WeatherDao
 import com.gub.data.database.daoImpl.SignalDaoImpl
 import com.gub.data.database.daoImpl.TrafficStatsDaoImpl
 import com.gub.data.database.daoImpl.WeatherDaoImpl
+import com.gub.data.repository.RepositoryAnalyticsImpl
 import com.gub.data.repository.RepositoryDashboardImpl
 import com.gub.data.repository.RepositoryMonitoringImpl
 import com.gub.data.service.common.WeatherService
 import com.gub.data.service.dashboard.ServiceTrafficMeasure
 import com.gub.data.service.dashboard.SystemOverviewService
 import com.gub.data.service.monitoring.ServiceLiveSignal
+import com.gub.domain.repository.RepositoryAnalytics
 import com.gub.domain.repository.RepositoryDashboard
 import com.gub.domain.repository.RepositoryMonitoring
+import com.gub.domain.usecase.analytics.UseCaseTrafficVolume
 import com.gub.domain.usecase.dashboard.UseCaseLiveTraffic
 import com.gub.domain.usecase.dashboard.UseCaseSystemOverview
 import com.gub.domain.usecase.monitoring.UseCaseLiveSignal
@@ -33,10 +36,12 @@ val dashboardModule = module {
     single { SystemOverviewService(get(), get(), get()) }
 
     // Repository
+    single { RepositoryAnalyticsImpl() as RepositoryAnalytics }
     single { RepositoryMonitoringImpl(get()) as RepositoryMonitoring }
     single { RepositoryDashboardImpl(get(), get()) as RepositoryDashboard }
 
     // Use Cases
+    single { UseCaseTrafficVolume(get()) }
     single { UseCaseLiveSignal(get()) }
     single { UseCaseLiveTraffic(get()) }
     single { UseCaseSystemOverview(get()) }

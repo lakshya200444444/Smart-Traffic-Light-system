@@ -45,7 +45,7 @@ class ViewModelAnalytics : ViewModel() {
     val isRefreshing: StateFlow<Boolean> = _isRefreshing.asStateFlow()
 
     // Current time: 2025-06-29 05:24:38 UTC
-    private val currentTimeMillis = 1750851878000L // 2025-06-29 05:24:38 UTC in milliseconds
+    private val currentTimeMillis = System.currentTimeMillis() // 2025-06-29 05:24:38 UTC in milliseconds
 
     init {
         loadInitialData()

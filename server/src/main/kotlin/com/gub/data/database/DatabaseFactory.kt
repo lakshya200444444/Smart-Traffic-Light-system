@@ -26,7 +26,7 @@ object DatabaseFactory {
 
         CoroutineScope(Dispatchers.IO).launch {
             delay(1000L)
-            DummyData.roadIds
+//            DummyData.roadIds
         }
     }
 
