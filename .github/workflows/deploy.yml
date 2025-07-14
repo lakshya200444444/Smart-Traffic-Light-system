@@ -21,7 +21,7 @@ jobs:
       - name: SSH into VM and deploy
         uses: appleboy/ssh-action@v1.0.0
         with:
-          host: 35.240.216.70
+          host: 34.87.172.238
           username: sourav_0_alim
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
