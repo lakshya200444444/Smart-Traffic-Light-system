@@ -25,6 +25,8 @@ jobs:
           username: sourav_0_alim
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
+            set -euxo pipefail
+
             echo "📁 Checking project directory..."
             if [ ! -d ~/Smart-Traffic-Management-System ]; then
               echo "📥 Cloning project..."
@@ -32,7 +34,7 @@ jobs:
             fi
 
             echo "🔄 Navigating to project directory..."
-            cd ~/Smart-Traffic-Management-System || exit 1
+            cd ~/Smart-Traffic-Management-System
 
             echo "📦 Pulling latest code..."
             git pull origin master
