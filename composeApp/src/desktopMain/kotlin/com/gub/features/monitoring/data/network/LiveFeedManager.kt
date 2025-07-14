@@ -18,7 +18,7 @@ import org.jetbrains.skia.Image.Companion.makeFromEncoded
 import java.nio.ByteBuffer
 
 suspend fun sendFrameToPythonSocket(frame: BufferedImage): Pair<ByteArray, String> = withContext(Dispatchers.IO) {
-    val socket = Socket("127.0.0.1", 5001)
+    val socket = Socket("34.87.172.238", 5001)
     val out = DataOutputStream(socket.getOutputStream())
     val input = DataInputStream(socket.getInputStream())
 
@@ -64,7 +64,7 @@ class LiveFeedManager {
             val annotatedImage = makeFromEncoded(annotatedBytes).toComposeImageBitmap()
 
             onFrameUpdate(annotatedImage, vehicleCount)
-            delay(25) // Throttle or match frame rate
+//            delay(25) // Throttle or match frame rate
         }
 
         grabber.stop()

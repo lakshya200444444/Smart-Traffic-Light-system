@@ -2,8 +2,8 @@ package com.gub.app
 
 object Const {
 
-    private const val BASE_URL = "localhost"
-//    private const val BASE_URL = "34.87.172.238"
+//    private const val BASE_URL = "localhost"
+    private const val BASE_URL = "34.87.172.238"
 
     private const val DEFAULT_SERVER_URL = BASE_URL
 
