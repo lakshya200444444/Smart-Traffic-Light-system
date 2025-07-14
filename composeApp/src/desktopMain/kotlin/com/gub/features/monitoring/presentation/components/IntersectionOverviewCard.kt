@@ -24,12 +24,19 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.gub.domain.models.monitoring.ModelLiveSignal
 import com.gub.features.monitoring.presentation.TrafficLightState
+import com.gub.features.monitoring.viewModel.MonitoringUiState
+import com.gub.features.monitoring.viewModel.ViewModelMonitoring
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.StateFlow
 import kotlin.random.Random
 
 @Composable
-fun IntersectionOverviewCard(modifier: Modifier = Modifier) {
+fun IntersectionOverviewCard(
+    modifier: Modifier = Modifier,
+    viewModelMonitoring: ViewModelMonitoring
+) {
 
     var selectedView by remember { mutableStateOf("Live") }
 
@@ -53,7 +60,7 @@ fun IntersectionOverviewCard(modifier: Modifier = Modifier) {
 
             // Main Intersection Display
             when (selectedView) {
-                "Live" -> LiveIntersectionView()
+                "Live" -> LiveIntersectionView(viewModelMonitoring.uiState)
                 "Stats" -> StatsView()
                 "History" -> HistoryView()
             }
@@ -79,7 +86,7 @@ private fun ModernHeader() {
             ) {
                 Box(
                     modifier = Modifier
-                        .size(32.dp)
+                        .size(28.dp)
                         .background(
                             Brush.linearGradient(
                                 colors = listOf(Color(0xFF00D4FF), Color(0xFF0099CC))
@@ -92,10 +99,10 @@ private fun ModernHeader() {
                         Icons.Default.Traffic,
                         contentDescription = null,
                         tint = Color.White,
-                        modifier = Modifier.size(18.dp)
+                        modifier = Modifier.size(16.dp)
                     )
                 }
-                Spacer(modifier = Modifier.width(12.dp))
+                Spacer(modifier = Modifier.width(16.dp))
                 Column {
                     Text(
                         "Mirpur 10",
@@ -103,11 +110,11 @@ private fun ModernHeader() {
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold
                     )
-                    Text(
-                        "Times Square District • User: Alims-Repo",
-                        color = MaterialTheme.colorScheme.onSurface.copy(0.75F),
-                        fontSize = 11.sp
-                    )
+//                    Text(
+//                        "Times Square District • User: Alims-Repo",
+//                        color = MaterialTheme.colorScheme.onSurface.copy(0.75F),
+//                        fontSize = 11.sp
+//                    )
                 }
             }
         }
@@ -149,20 +156,28 @@ private fun StatusBadge() {
                     )
             )
             Spacer(modifier = Modifier.width(8.dp))
-            Column {
-                Text(
-                    "ACTIVE",
-                    color = Color(0xFF10B981),
-                    fontSize = 10.sp,
-                    fontWeight = FontWeight.Bold,
-                    letterSpacing = 0.5.sp
-                )
-                Text(
-                    "2025-06-23 09:18:36",
-                    color = Color(0xFF6B7280),
-                    fontSize = 8.sp
-                )
-            }
+
+            Text(
+                "ACTIVE",
+                color = Color(0xFF10B981),
+                fontSize = 10.sp,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = 0.5.sp
+            )
+//            Column {
+//                Text(
+//                    "ACTIVE",
+//                    color = Color(0xFF10B981),
+//                    fontSize = 10.sp,
+//                    fontWeight = FontWeight.Bold,
+//                    letterSpacing = 0.5.sp
+//                )
+//                Text(
+//                    "2025-06-23 09:18:36",
+//                    color = Color(0xFF6B7280),
+//                    fontSize = 8.sp
+//                )
+//            }
         }
     }
 }
@@ -217,7 +232,7 @@ private fun ViewSelector(selectedView: String, onViewChange: (String) -> Unit) {
 }
 
 @Composable
-private fun LiveIntersectionView() {
+private fun LiveIntersectionView(viewModelMonitoring: StateFlow<MonitoringUiState>) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -240,7 +255,7 @@ private fun LiveIntersectionView() {
         SmartTrafficLights()
 
         // Dynamic Vehicles
-        DynamicVehicleFlow()
+        DynamicVehicleFlow(viewModelMonitoring)
 
         // Traffic Info Overlay
 //        TrafficInfoOverlay()
@@ -542,21 +557,23 @@ private fun SmartSignalBox(
 }
 
 @Composable
-private fun DynamicVehicleFlow() {
-    var vehicles by remember {
-        mutableStateOf(
-            generateRandomVehicles()
-        )
+fun DynamicVehicleFlow(viewModelMonitoring: StateFlow<MonitoringUiState>) {
+    val uiState by viewModelMonitoring.collectAsState()
+
+    var vehicles by remember { mutableStateOf<List<Vehicle>>(emptyList()) }
+
+    LaunchedEffect(uiState.liveSignal) {
+        // When new live signal data comes in, update vehicle generation logic
+        uiState.liveSignal?.let { signal ->
+            vehicles = generateVehiclesFromSignal(signal)
+        }
     }
 
     LaunchedEffect(Unit) {
         while (true) {
             vehicles = vehicles.map { vehicle ->
                 updateVehiclePosition(vehicle)
-            }.filter { it.position < 1.2f } +
-                    if (Random.nextFloat() < 0.08f) {
-                        listOf(generateRandomVehicle())
-                    } else emptyList()
+            }.filter { it.position < 1.2f }
 
             delay(100)
         }
@@ -565,7 +582,6 @@ private fun DynamicVehicleFlow() {
     Box(modifier = Modifier.fillMaxSize()) {
         vehicles.forEach { vehicle ->
             val (x, y) = getVehicleScreenPosition(vehicle)
-
             ModernVehicle(
                 modifier = Modifier.offset(x.dp, y.dp),
                 vehicle = vehicle
@@ -573,6 +589,80 @@ private fun DynamicVehicleFlow() {
         }
     }
 }
+
+fun generateVehiclesFromSignal(signal: ModelLiveSignal): List<Vehicle> {
+    val roadToLanes = mapOf(
+        VehicleLane.BROADWAY_EAST_1 to signal.east,
+        VehicleLane.BROADWAY_EAST_2 to signal.east,
+        VehicleLane.BROADWAY_EAST_3 to signal.east,
+
+        VehicleLane.BROADWAY_WEST_1 to signal.west,
+        VehicleLane.BROADWAY_WEST_2 to signal.west,
+        VehicleLane.BROADWAY_WEST_3 to signal.west,
+
+        VehicleLane.STREET_42_SOUTH_1 to signal.south,
+        VehicleLane.STREET_42_SOUTH_2 to signal.south,
+        VehicleLane.STREET_42_SOUTH_3 to signal.south,
+
+        VehicleLane.STREET_42_NORTH_1 to signal.north,
+        VehicleLane.STREET_42_NORTH_2 to signal.north,
+        VehicleLane.STREET_42_NORTH_3 to signal.north,
+    )
+
+    var idCounter = 0
+
+    return roadToLanes.flatMap { (lane, road) ->
+        val count = when (road.type) {
+            ModelLiveSignal.Road.SignalType.GREEN -> road.vehicleCount / 3
+            else -> road.vehicleCount
+        }.coerceAtMost(5) // limit per lane
+
+        List(count) {
+            val type = VehicleType.values().random()
+            Vehicle(
+                id = idCounter++,
+                lane = lane,
+                type = type,
+                position = 0f,
+                speed = Random.nextFloat() * 0.01f + 0.005f,
+                color = type.color
+            )
+        }
+    }
+}
+
+//@Composable
+//private fun DynamicVehicleFlow(viewModelMonitoring: StateFlow<MonitoringUiState>) {
+//    var vehicles by remember {
+//        mutableStateOf(
+//            generateRandomVehicles()
+//        )
+//    }
+//
+//    LaunchedEffect(Unit) {
+//        while (true) {
+//            vehicles = vehicles.map { vehicle ->
+//                updateVehiclePosition(vehicle)
+//            }.filter { it.position < 1.2f } +
+//                    if (Random.nextFloat() < 0.08f) {
+//                        listOf(generateRandomVehicle())
+//                    } else emptyList()
+//
+//            delay(100)
+//        }
+//    }
+//
+//    Box(modifier = Modifier.fillMaxSize()) {
+//        vehicles.forEach { vehicle ->
+//            val (x, y) = getVehicleScreenPosition(vehicle)
+//
+//            ModernVehicle(
+//                modifier = Modifier.offset(x.dp, y.dp),
+//                vehicle = vehicle
+//            )
+//        }
+//    }
+//}
 
 data class Vehicle(
     val id: Int,
@@ -582,6 +672,8 @@ data class Vehicle(
     val speed: Float,
     val color: Color
 )
+
+
 
 enum class VehicleLane {
     BROADWAY_EAST_1, BROADWAY_EAST_2, BROADWAY_EAST_3,  // Left to right movement

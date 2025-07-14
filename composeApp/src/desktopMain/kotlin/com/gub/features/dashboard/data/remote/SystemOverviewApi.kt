@@ -8,11 +8,14 @@ import io.ktor.client.request.*
 import io.ktor.http.*
 
 interface SystemOverviewApi {
+
     suspend fun getSystemOverview(): ModelSystemOverview
+
     suspend fun updateSystemOverview(overview: ModelSystemOverview): Unit
 
     suspend fun liveTrafficMatrics(): ModelLiveTraffic
 }
+
 
 class SystemOverviewApiImpl(
     private val httpClient: HttpClient

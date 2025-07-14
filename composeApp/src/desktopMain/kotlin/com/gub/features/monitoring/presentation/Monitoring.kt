@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.sp
 import com.gub.features.monitoring.presentation.components.IntersectionOverviewCard
 import com.gub.features.monitoring.presentation.components.LiveCameraFeedCard
 import com.gub.features.monitoring.presentation.components.TopBarMonitoring
+import com.gub.features.monitoring.viewModel.ViewModelMonitoring
 import com.gub.utils.UiCalculations.toDp
 import dev.chrisbanes.haze.hazeSource
 import dev.chrisbanes.haze.rememberHazeState
@@ -35,6 +36,8 @@ fun Monitoring() {
 
     val hazeState = rememberHazeState()
     var height by remember { mutableStateOf(0) }
+
+    val viewModelMonitoring = remember { ViewModelMonitoring() }
 
 //    AnimatedContent(
 //        targetState = isCameraExpanded
@@ -82,7 +85,11 @@ fun Monitoring() {
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    IntersectionOverviewCard(modifier = Modifier.weight(2f))
+                    IntersectionOverviewCard(
+                        modifier = Modifier.weight(2f),
+                        viewModelMonitoring = viewModelMonitoring
+                    )
+
                     TrafficControlPanelCard(modifier = Modifier.weight(1f))
                 }
             }

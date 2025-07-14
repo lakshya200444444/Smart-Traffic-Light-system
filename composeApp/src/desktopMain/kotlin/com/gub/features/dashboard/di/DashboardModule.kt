@@ -7,18 +7,33 @@ import com.gub.features.dashboard.data.repository.SystemOverviewRepositoryImpl
 import com.gub.features.dashboard.domain.repository.SystemOverviewRepository
 import com.gub.features.dashboard.domain.usecase.GetSystemOverviewUseCase
 import com.gub.features.dashboard.domain.usecase.UpdateSystemMetricsUseCase
+import com.gub.features.monitoring.data.network.LiveSignalApi
+import com.gub.features.monitoring.data.network.LiveSignalApiImpl
+import com.gub.features.monitoring.data.repository.RepositoryLiveSignalImpl
+import com.gub.features.monitoring.domain.repository.RepositoryLiveSignal
+import com.gub.features.monitoring.domain.usecase.UseCaseLiveSignal
 
 object DashboardModule {
 
-    private val systemOverviewApiImpl: SystemOverviewApi by lazy {
+    private val systemOverviewApi: SystemOverviewApi by lazy {
         SystemOverviewApiImpl(provideHttpClient())
     }
 
-    private val SystemOverviewRepository: SystemOverviewRepository by lazy {
-        SystemOverviewRepositoryImpl(systemOverviewApiImpl)
+    private val liveSignalApi: LiveSignalApi by lazy {
+        LiveSignalApiImpl(provideHttpClient())
     }
 
-    val getSystemOverviewUseCase by lazy { GetSystemOverviewUseCase(SystemOverviewRepository) }
+    private val systemOverviewRepository: SystemOverviewRepository by lazy {
+        SystemOverviewRepositoryImpl(systemOverviewApi)
+    }
 
-    val updateSystemMetricsUseCase by lazy { UpdateSystemMetricsUseCase(SystemOverviewRepository) }
+    private val repositoryLiveSignal: RepositoryLiveSignal by lazy {
+        RepositoryLiveSignalImpl(liveSignalApi)
+    }
+
+    val getUseCaseLiveSignal by lazy { UseCaseLiveSignal(repositoryLiveSignal) }
+
+    val getSystemOverviewUseCase by lazy { GetSystemOverviewUseCase(systemOverviewRepository) }
+
+    val updateSystemMetricsUseCase by lazy { UpdateSystemMetricsUseCase(systemOverviewRepository) }
 }

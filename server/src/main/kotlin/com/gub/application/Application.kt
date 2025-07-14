@@ -2,7 +2,9 @@ package com.gub.application
 
 import com.gub.SERVER_PORT
 import com.gub.di.dashboardModule
+import com.gub.routes.analytics
 import com.gub.routes.dashboardRoute
+import com.gub.routes.monitoring
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
@@ -38,6 +40,8 @@ fun Application.module() {
 
     // Configure routing
     routing {
+        analytics()
+        monitoring()
         dashboardRoute()
     }
 }
