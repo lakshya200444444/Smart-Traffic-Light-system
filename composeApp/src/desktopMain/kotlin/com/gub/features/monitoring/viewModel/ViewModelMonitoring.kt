@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.gub.core.domain.Response
 import com.gub.domain.models.monitoring.ModelLiveSignal
 import com.gub.features.dashboard.di.DashboardModule
+import com.gub.features.monitoring.di.MonitoringModule
 import com.gub.features.monitoring.domain.usecase.UseCaseLiveSignal
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -12,7 +13,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class ViewModelMonitoring(
-    private val liveSignal: UseCaseLiveSignal = DashboardModule.getUseCaseLiveSignal
+    private val liveSignal: UseCaseLiveSignal = MonitoringModule.getUseCaseLiveSignal
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(MonitoringUiState())

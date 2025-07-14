@@ -19,19 +19,9 @@ object DashboardModule {
         SystemOverviewApiImpl(provideHttpClient())
     }
 
-    private val liveSignalApi: LiveSignalApi by lazy {
-        LiveSignalApiImpl(provideHttpClient())
-    }
-
     private val systemOverviewRepository: SystemOverviewRepository by lazy {
         SystemOverviewRepositoryImpl(systemOverviewApi)
     }
-
-    private val repositoryLiveSignal: RepositoryLiveSignal by lazy {
-        RepositoryLiveSignalImpl(liveSignalApi)
-    }
-
-    val getUseCaseLiveSignal by lazy { UseCaseLiveSignal(repositoryLiveSignal) }
 
     val getSystemOverviewUseCase by lazy { GetSystemOverviewUseCase(systemOverviewRepository) }
 

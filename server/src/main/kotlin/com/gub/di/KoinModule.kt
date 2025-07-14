@@ -36,7 +36,7 @@ val dashboardModule = module {
     single { SystemOverviewService(get(), get(), get()) }
 
     // Repository
-    single { RepositoryAnalyticsImpl() as RepositoryAnalytics }
+    single { RepositoryAnalyticsImpl(get()) as RepositoryAnalytics }
     single { RepositoryMonitoringImpl(get()) as RepositoryMonitoring }
     single { RepositoryDashboardImpl(get(), get()) as RepositoryDashboard }
 

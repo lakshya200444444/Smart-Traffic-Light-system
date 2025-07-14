@@ -14,11 +14,13 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
@@ -27,8 +29,12 @@ import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.gub.core.domain.Response
+import com.gub.domain.models.analytics.ModelTrafficVolume
 import com.gub.features.analytics.domain.model.ChartDataPoint
 import com.gub.features.analytics.viewModel.ViewModelAnalytics
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.LocalTime
 
 @Composable
 fun InteractiveTrafficVolumeChartCard(
@@ -152,7 +158,7 @@ fun InteractiveTrafficVolumeChartCard(
                 }
                 is Response.Success -> {
                     TrafficVolumeChart(
-                        dataPoints = response.data,
+                        model = response.data,
                         modifier = Modifier.fillMaxSize()
                     )
                 }
@@ -199,9 +205,12 @@ private fun MetricItem(
 
 @Composable
 private fun TrafficVolumeChart(
-    dataPoints: List<ChartDataPoint>,
+    model: ModelTrafficVolume,
     modifier: Modifier = Modifier
 ) {
+
+    val dataPoints = remember(model) { model.toChartData() }
+
     if (dataPoints.isEmpty()) {
         Box(
             modifier = modifier,
@@ -216,11 +225,11 @@ private fun TrafficVolumeChart(
 
     Box(modifier = modifier) {
         val color = MaterialTheme.colorScheme.onSurface
+
         Canvas(modifier = Modifier.fillMaxSize()) {
             drawTrafficChart(dataPoints, textMeasurer, color)
         }
 
-        // Time labels overlay
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -229,34 +238,62 @@ private fun TrafficVolumeChart(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             dataPoints.forEachIndexed { index, point ->
-                if (index % 6 == 0) { // Show every 6th hour
+//                if (index % (dataPoints.size / 6).coerceAtLeast(1) == 0) {
                     Text(
                         text = point.label,
                         fontSize = 8.sp,
                         color = Color.Gray
                     )
-                }
+//                }
             }
         }
+    }
+}
+
+fun ModelTrafficVolume.toChartData(): List<ChartDataPoint> {
+    val now = LocalDateTime.now()
+    val baseTimestamp = System.currentTimeMillis()
+
+    return trafficVolume.mapIndexed { index, value ->
+        val label = when (type) {
+            ModelTrafficVolume.TrafficVolumeType.HOURLY -> "${index}:00"
+            ModelTrafficVolume.TrafficVolumeType.DAILY -> listOf("Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat").getOrElse(index) { "" }
+            ModelTrafficVolume.TrafficVolumeType.WEEKLY -> "Wk ${index + 1}"
+            ModelTrafficVolume.TrafficVolumeType.MONTHLY -> "D${index + 1}"
+        }
+
+        val isPrediction = when (type) {
+            ModelTrafficVolume.TrafficVolumeType.HOURLY -> index > now.hour
+            ModelTrafficVolume.TrafficVolumeType.DAILY -> index > (now.dayOfWeek.value % 7)
+            ModelTrafficVolume.TrafficVolumeType.WEEKLY -> false // Optional: implement your own logic
+            ModelTrafficVolume.TrafficVolumeType.MONTHLY -> index > now.dayOfMonth - 1
+        }
+
+        ChartDataPoint(
+            hour = index,
+            value = value,
+            prediction = isPrediction,
+            timestamp = baseTimestamp + index * 3600_000L, // 1 hour spacing
+            label = label,
+            color = if (isPrediction) "#FF9800" else "#2196F3"
+        )
     }
 }
 
 private fun DrawScope.drawTrafficChart(
     dataPoints: List<ChartDataPoint>,
     textMeasurer: TextMeasurer,
-    color: Color
+    defaultColor: Color
 ) {
     val width = size.width
     val height = size.height
     val padding = 40f
-    val bottomPadding = 60f // Extra space for labels
+    val bottomPadding = 60f // Leave room for X-axis labels
 
-    // Find max value for scaling
     val maxValue = dataPoints.maxOfOrNull { it.value }?.toFloat() ?: 1f
     val minValue = dataPoints.minOfOrNull { it.value }?.toFloat() ?: 0f
     val valueRange = if (maxValue - minValue > 0) maxValue - minValue else 1f
 
-    // Create path for the line chart
     val path = Path()
     val gradientPath = Path()
 
@@ -274,22 +311,26 @@ private fun DrawScope.drawTrafficChart(
             gradientPath.lineTo(x, adjustedY)
         }
 
-        // Draw data points
-        val pointColor = if (point.prediction) Color(0xFFFF9800) else Color(0xFF2196F3)
+        // Convert color hex string to Compose Color
+        val pointColor = try {
+//            Color(parseColor(point.color))
+            Color.Red
+        } catch (_: Exception) {
+            defaultColor
+        }
+
+        // Draw data point circle
         drawCircle(
             color = pointColor,
             radius = if (point.prediction) 6f else 4f,
             center = Offset(x, adjustedY)
         )
 
-        // Draw value labels for peak points
+        // Optional: draw value above peak points
         if (point.value > maxValue * 0.8f) {
             val textResult = textMeasurer.measure(
                 text = "${point.value}",
-                style = TextStyle(
-                    fontSize = 8.sp,
-                    color = color
-                )
+                style = TextStyle(fontSize = 8.sp, color = defaultColor)
             )
             drawText(
                 textLayoutResult = textResult,
@@ -302,10 +343,10 @@ private fun DrawScope.drawTrafficChart(
     }
 
     // Close gradient path
-    gradientPath.lineTo(width - padding, height - bottomPadding)
+    gradientPath.lineTo(padding + (dataPoints.size - 1) * (width - 2 * padding) / (dataPoints.size - 1), height - bottomPadding)
     gradientPath.close()
 
-    // Draw gradient fill
+    // Draw area gradient
     val gradient = Brush.verticalGradient(
         colors = listOf(
             Color(0xFF2196F3).copy(alpha = 0.3f),
@@ -315,24 +356,16 @@ private fun DrawScope.drawTrafficChart(
         startY = padding,
         endY = height - bottomPadding
     )
+    drawPath(path = gradientPath, brush = gradient)
 
-    drawPath(
-        path = gradientPath,
-        brush = gradient
-    )
-
-    // Draw the main line
+    // Draw the chart line
     drawPath(
         path = path,
         color = Color(0xFF2196F3),
-        style = androidx.compose.ui.graphics.drawscope.Stroke(
-            width = 3f,
-            cap = StrokeCap.Round,
-            join = StrokeJoin.Round
-        )
+        style = Stroke(width = 3f, cap = StrokeCap.Round, join = StrokeJoin.Round)
     )
 
-    // Draw grid lines
+    // Draw horizontal grid lines
     for (i in 1..4) {
         val y = bottomPadding + (i * (height - bottomPadding - padding) / 5)
         val gridY = height - y
@@ -344,54 +377,199 @@ private fun DrawScope.drawTrafficChart(
             strokeWidth = 1f
         )
 
-        // Draw value labels on Y-axis
+        // Draw Y-axis value labels
         val value = (minValue + (i * valueRange / 5)).toInt()
-        val textResult = textMeasurer.measure(
+        val label = textMeasurer.measure(
             text = "$value",
-            style = TextStyle(
-                fontSize = 8.sp,
-                color = Color.Gray
-            )
+            style = TextStyle(fontSize = 8.sp, color = Color.Gray)
         )
         drawText(
-            textLayoutResult = textResult,
-            topLeft = Offset(
-                8f,
-                gridY - textResult.size.height / 2
-            )
+            textLayoutResult = label,
+            topLeft = Offset(8f, gridY - label.size.height / 2)
         )
     }
 
-    // Draw prediction indicator
-    val currentHour = 17 // Assuming current time is around 17:00
-    if (currentHour < dataPoints.size) {
-        val currentX = padding + (currentHour * (width - 2 * padding) / (dataPoints.size - 1))
+    // Draw vertical "Now" marker if prediction points exist
+    val nowIndex = dataPoints.indexOfFirst { it.prediction }
+    if (nowIndex in 1 until dataPoints.size) {
+        val nowX = padding + (nowIndex * (width - 2 * padding) / (dataPoints.size - 1))
         drawLine(
             color = Color(0xFFFF9800).copy(alpha = 0.6f),
-            start = Offset(currentX, bottomPadding),
-            end = Offset(currentX, height - padding),
+            start = Offset(nowX, bottomPadding),
+            end = Offset(nowX, height - padding),
             strokeWidth = 2f,
             pathEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 5f))
         )
 
-        // Draw "Now" label
-        val nowTextResult = textMeasurer.measure(
+        val nowLabel = textMeasurer.measure(
             text = "Now",
             style = TextStyle(
                 fontSize = 8.sp,
-                color = Color(0xFFFF9800),
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFFFF9800)
             )
         )
         drawText(
-            textLayoutResult = nowTextResult,
+            textLayoutResult = nowLabel,
             topLeft = Offset(
-                currentX - nowTextResult.size.width / 2,
-                bottomPadding - nowTextResult.size.height - 4f
+                nowX - nowLabel.size.width / 2,
+                bottomPadding - nowLabel.size.height - 4f
             )
         )
     }
 }
+
+//private fun DrawScope.drawTrafficChart(
+//    dataPoints: List<ChartDataPoint>,
+//    textMeasurer: TextMeasurer,
+//    color: Color
+//) {
+//    val width = size.width
+//    val height = size.height
+//    val padding = 40f
+//    val bottomPadding = 60f // Extra space for labels
+//
+//    // Find max value for scaling
+//    val maxValue = dataPoints.maxOfOrNull { it.value }?.toFloat() ?: 1f
+//    val minValue = dataPoints.minOfOrNull { it.value }?.toFloat() ?: 0f
+//    val valueRange = if (maxValue - minValue > 0) maxValue - minValue else 1f
+//
+//    // Create path for the line chart
+//    val path = Path()
+//    val gradientPath = Path()
+//
+//    dataPoints.forEachIndexed { index, point ->
+//        val x = padding + (index * (width - 2 * padding) / (dataPoints.size - 1))
+//        val y = bottomPadding + ((point.value - minValue) / valueRange * (height - bottomPadding - padding))
+//        val adjustedY = height - y
+//
+//        if (index == 0) {
+//            path.moveTo(x, adjustedY)
+//            gradientPath.moveTo(x, height - bottomPadding)
+//            gradientPath.lineTo(x, adjustedY)
+//        } else {
+//            path.lineTo(x, adjustedY)
+//            gradientPath.lineTo(x, adjustedY)
+//        }
+//
+//        // Draw data points
+//        val pointColor = if (point.prediction) Color(0xFFFF9800) else Color(0xFF2196F3)
+//        drawCircle(
+//            color = pointColor,
+//            radius = if (point.prediction) 6f else 4f,
+//            center = Offset(x, adjustedY)
+//        )
+//
+//        // Draw value labels for peak points
+//        if (point.value > maxValue * 0.8f) {
+//            val textResult = textMeasurer.measure(
+//                text = "${point.value}",
+//                style = TextStyle(
+//                    fontSize = 8.sp,
+//                    color = color
+//                )
+//            )
+//            drawText(
+//                textLayoutResult = textResult,
+//                topLeft = Offset(
+//                    x - textResult.size.width / 2,
+//                    adjustedY - textResult.size.height - 8f
+//                )
+//            )
+//        }
+//    }
+//
+//    // Close gradient path
+//    gradientPath.lineTo(width - padding, height - bottomPadding)
+//    gradientPath.close()
+//
+//    // Draw gradient fill
+//    val gradient = Brush.verticalGradient(
+//        colors = listOf(
+//            Color(0xFF2196F3).copy(alpha = 0.3f),
+//            Color(0xFF2196F3).copy(alpha = 0.1f),
+//            Color.Transparent
+//        ),
+//        startY = padding,
+//        endY = height - bottomPadding
+//    )
+//
+//    drawPath(
+//        path = gradientPath,
+//        brush = gradient
+//    )
+//
+//    // Draw the main line
+//    drawPath(
+//        path = path,
+//        color = Color(0xFF2196F3),
+//        style = androidx.compose.ui.graphics.drawscope.Stroke(
+//            width = 3f,
+//            cap = StrokeCap.Round,
+//            join = StrokeJoin.Round
+//        )
+//    )
+//
+//    // Draw grid lines
+//    for (i in 1..4) {
+//        val y = bottomPadding + (i * (height - bottomPadding - padding) / 5)
+//        val gridY = height - y
+//
+//        drawLine(
+//            color = Color.Gray.copy(alpha = 0.2f),
+//            start = Offset(padding, gridY),
+//            end = Offset(width - padding, gridY),
+//            strokeWidth = 1f
+//        )
+//
+//        // Draw value labels on Y-axis
+//        val value = (minValue + (i * valueRange / 5)).toInt()
+//        val textResult = textMeasurer.measure(
+//            text = "$value",
+//            style = TextStyle(
+//                fontSize = 8.sp,
+//                color = Color.Gray
+//            )
+//        )
+//        drawText(
+//            textLayoutResult = textResult,
+//            topLeft = Offset(
+//                8f,
+//                gridY - textResult.size.height / 2
+//            )
+//        )
+//    }
+//
+//    // Draw prediction indicator
+//    val currentHour = 17 // Assuming current time is around 17:00
+//    if (currentHour < dataPoints.size) {
+//        val currentX = padding + (currentHour * (width - 2 * padding) / (dataPoints.size - 1))
+//        drawLine(
+//            color = Color(0xFFFF9800).copy(alpha = 0.6f),
+//            start = Offset(currentX, bottomPadding),
+//            end = Offset(currentX, height - padding),
+//            strokeWidth = 2f,
+//            pathEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 5f))
+//        )
+//
+//        // Draw "Now" label
+//        val nowTextResult = textMeasurer.measure(
+//            text = "Now",
+//            style = TextStyle(
+//                fontSize = 8.sp,
+//                color = Color(0xFFFF9800),
+//                fontWeight = FontWeight.Bold
+//            )
+//        )
+//        drawText(
+//            textLayoutResult = nowTextResult,
+//            topLeft = Offset(
+//                currentX - nowTextResult.size.width / 2,
+//                bottomPadding - nowTextResult.size.height - 4f
+//            )
+//        )
+//    }
+//}
 
 @Composable
 private fun ErrorChartState(error: String, onRetry: () -> Unit) {
