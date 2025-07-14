@@ -6,6 +6,7 @@ import com.gub.routes.analytics
 import com.gub.routes.dashboardRoute
 import com.gub.routes.monitoring
 import com.gub.routes.settings
+import com.gub.routes.system
 import com.gub.utils.InstantSerializer
 import com.gub.utils.json
 import io.ktor.http.ContentType.Application.Json
@@ -44,6 +45,8 @@ fun Application.module() {
 
     // Configure routing
     routing {
+        system()
+
         settings()
         analytics()
         monitoring()
