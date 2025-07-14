@@ -1,6 +1,7 @@
 package com.gub.data.database.entity
 
-import java.io.Serializable
+import kotlinx.serialization.Contextual
+import kotlinx.serialization.Serializable
 import java.time.Instant
 import java.util.*
 
@@ -9,5 +10,5 @@ data class TrafficStats(
     val timestamp: Instant = Instant.now(),
     val measureDuration: Long,
     val roadId: String,
-    val vehicleCount: Int,
-) : Serializable
+    val vehicleCount: Int
+) : java.io.Serializable

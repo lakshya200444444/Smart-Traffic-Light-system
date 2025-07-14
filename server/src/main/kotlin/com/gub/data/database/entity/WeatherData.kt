@@ -1,7 +1,8 @@
 package com.gub.data.database.entity
 
 import com.gub.models.dashboard.overview.ModelWeather
-import java.io.Serializable
+import kotlinx.serialization.Contextual
+import kotlinx.serialization.Serializable
 import java.time.Instant
 import java.util.*
 
@@ -12,7 +13,7 @@ data class WeatherData(
     val humidity: Double,
     val windSpeed: Double,
     val visibility: Double
-) : Serializable {
+) : java.io.Serializable {
 
     companion object {
         fun ModelWeather.toWeatherData() : WeatherData {
