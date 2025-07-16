@@ -7,6 +7,7 @@ import com.gub.domain.models.monitoring.ModelLiveSignal
 import com.gub.features.dashboard.di.DashboardModule
 import com.gub.features.monitoring.di.MonitoringModule
 import com.gub.features.monitoring.domain.usecase.UseCaseLiveSignal
+import com.gub.features.monitoring.presentation.components.TrafficPhase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -41,5 +42,6 @@ class ViewModelMonitoring(
 data class MonitoringUiState(
     val isLoading: Boolean = true,
     val liveSignal: ModelLiveSignal? = null,
+    val trafficPhase: TrafficPhase = TrafficPhase.NS_GREEN,
     val error: String? = null
 )

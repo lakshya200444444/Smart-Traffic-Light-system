@@ -46,7 +46,7 @@ fun Monitoring() {
 
     val liveFeedManager = remember { LiveFeedManager() }
     var currentFrame by remember { mutableStateOf<ImageBitmap?>(null) }
-    var vehicleCount by remember { mutableStateOf("") }
+    var vehicleCount by remember { mutableStateOf("{}") }
     var frameError by remember { mutableStateOf<String?>(null) }
 
     LazyColumn(
