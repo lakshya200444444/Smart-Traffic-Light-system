@@ -141,7 +141,7 @@ dependencies {
 
 compose.desktop {
     application {
-        mainClass = "com.gub.MainKt"
+        mainClass = "com.gub.app.MainKt"
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)

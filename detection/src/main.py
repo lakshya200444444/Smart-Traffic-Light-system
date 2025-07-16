@@ -86,13 +86,13 @@ import json
 from ultralytics import YOLO
 
 model = YOLO("yolov8n.pt")
-vehicle_classes = {2: "car", 3: "motorcycle", 5: "bus", 7: "truck"}
+vehicle_classes = {"person": 0, 2: "car", 3: "motorcycle", 5: "bus", 7: "truck"}
 
 def detect_and_annotate(image_bytes):
     frame = cv2.imdecode(np.frombuffer(image_bytes, np.uint8), cv2.IMREAD_COLOR)
     results = model(frame)[0]
 
-    counts = {"car": 0, "motorcycle": 0, "bus": 0, "truck": 0}
+    counts = {"person": 0, "car": 0, "motorcycle": 0, "bus": 0, "truck": 0}
 
     for r in results.boxes:
         cls = int(r.cls[0])

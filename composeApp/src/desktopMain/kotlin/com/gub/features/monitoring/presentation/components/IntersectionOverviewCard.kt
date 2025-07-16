@@ -30,12 +30,15 @@ import com.gub.features.monitoring.viewModel.MonitoringUiState
 import com.gub.features.monitoring.viewModel.ViewModelMonitoring
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.StateFlow
+import org.jetbrains.compose.ui.tooling.preview.Preview
 import kotlin.random.Random
 
 @Composable
 fun IntersectionOverviewCard(
     modifier: Modifier = Modifier,
-    viewModelMonitoring: ViewModelMonitoring
+    viewModelMonitoring: ViewModelMonitoring,
+    vehicleCount: String,
+    intersectionName: MutableState<String>
 ) {
 
     var selectedView by remember { mutableStateOf("Live") }
@@ -49,7 +52,7 @@ fun IntersectionOverviewCard(
             modifier = Modifier.padding(24.dp)
         ) {
             // Modern Header
-            ModernHeader()
+            ModernHeader(intersectionName = intersectionName)
 
             Spacer(modifier = Modifier.height(20.dp))
 
@@ -60,7 +63,11 @@ fun IntersectionOverviewCard(
 
             // Main Intersection Display
             when (selectedView) {
-                "Live" -> LiveIntersectionView(viewModelMonitoring.uiState)
+                "Live" -> LiveIntersectionView(
+                    viewModelMonitoring.uiState,
+                    vehicleCount = vehicleCount,
+                    intersectionName = intersectionName
+                )
                 "Stats" -> StatsView()
                 "History" -> HistoryView()
             }
@@ -74,7 +81,7 @@ fun IntersectionOverviewCard(
 }
 
 @Composable
-private fun ModernHeader() {
+private fun ModernHeader(intersectionName: MutableState<String>) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -105,7 +112,7 @@ private fun ModernHeader() {
                 Spacer(modifier = Modifier.width(16.dp))
                 Column {
                     Text(
-                        "Mirpur 10",
+                        text = intersectionName.value,
                         color = MaterialTheme.colorScheme.onSurface,
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold
@@ -218,7 +225,11 @@ private fun ViewSelector(selectedView: String, onViewChange: (String) -> Unit) {
 }
 
 @Composable
-private fun LiveIntersectionView(viewModelMonitoring: StateFlow<MonitoringUiState>) {
+private fun LiveIntersectionView(
+    viewModelMonitoring: StateFlow<MonitoringUiState>,
+    vehicleCount: String,
+    intersectionName: MutableState<String>
+) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -241,7 +252,10 @@ private fun LiveIntersectionView(viewModelMonitoring: StateFlow<MonitoringUiStat
         SmartTrafficLights()
 
         // Dynamic Vehicles
-        DynamicVehicleFlow(viewModelMonitoring)
+        DynamicVehicleFlow(
+            viewModelMonitoring,
+            vehicleCount = vehicleCount
+        )
 
         // Traffic Info Overlay
 //        TrafficInfoOverlay()
@@ -364,6 +378,12 @@ private fun BoxScope.ModernRoadNetwork() {
 }
 
 @Composable
+@Preview
+fun PreviewSmartTrafficLights() {
+    SmartTrafficLights()
+}
+
+@Composable
 private fun SmartTrafficLights() {
     var currentPhase by remember { mutableStateOf(TrafficPhase.NS_GREEN) }
     var timeRemaining by remember { mutableStateOf(45) }
@@ -396,13 +416,10 @@ private fun SmartTrafficLights() {
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        // Corrected signal positions at intersection corners
-
-        // North Signal (for southbound traffic from 42nd St)
         SmartSignalBox(
             modifier = Modifier
                 .align(Alignment.TopCenter)
-                .offset(x = 25.dp, y = 50.dp),
+                .offset(x = 60.dp, y = 0.dp),
             direction = "N",
             state = when (currentPhase) {
                 TrafficPhase.NS_GREEN -> TrafficLightState.GREEN
@@ -430,7 +447,7 @@ private fun SmartTrafficLights() {
         SmartSignalBox(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .offset(x = (-25).dp, y = (-50).dp),
+                .offset(x = (-60).dp, y = (-0).dp),
             direction = "S",
             state = when (currentPhase) {
                 TrafficPhase.NS_GREEN -> TrafficLightState.GREEN
@@ -543,13 +560,12 @@ private fun SmartSignalBox(
 }
 
 @Composable
-fun DynamicVehicleFlow(viewModelMonitoring: StateFlow<MonitoringUiState>) {
+fun DynamicVehicleFlow(viewModelMonitoring: StateFlow<MonitoringUiState>, vehicleCount: String) {
     val uiState by viewModelMonitoring.collectAsState()
 
     var vehicles by remember { mutableStateOf<List<Vehicle>>(emptyList()) }
 
     LaunchedEffect(uiState.liveSignal) {
-        // When new live signal data comes in, update vehicle generation logic
         uiState.liveSignal?.let { signal ->
             vehicles = generateVehiclesFromSignal(signal)
         }
@@ -617,39 +633,6 @@ fun generateVehiclesFromSignal(signal: ModelLiveSignal): List<Vehicle> {
     }
 }
 
-//@Composable
-//private fun DynamicVehicleFlow(viewModelMonitoring: StateFlow<MonitoringUiState>) {
-//    var vehicles by remember {
-//        mutableStateOf(
-//            generateRandomVehicles()
-//        )
-//    }
-//
-//    LaunchedEffect(Unit) {
-//        while (true) {
-//            vehicles = vehicles.map { vehicle ->
-//                updateVehiclePosition(vehicle)
-//            }.filter { it.position < 1.2f } +
-//                    if (Random.nextFloat() < 0.08f) {
-//                        listOf(generateRandomVehicle())
-//                    } else emptyList()
-//
-//            delay(100)
-//        }
-//    }
-//
-//    Box(modifier = Modifier.fillMaxSize()) {
-//        vehicles.forEach { vehicle ->
-//            val (x, y) = getVehicleScreenPosition(vehicle)
-//
-//            ModernVehicle(
-//                modifier = Modifier.offset(x.dp, y.dp),
-//                vehicle = vehicle
-//            )
-//        }
-//    }
-//}
-
 data class Vehicle(
     val id: Int,
     val lane: VehicleLane,
@@ -658,7 +641,6 @@ data class Vehicle(
     val speed: Float,
     val color: Color
 )
-
 
 
 enum class VehicleLane {
