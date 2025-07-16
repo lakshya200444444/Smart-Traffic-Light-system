@@ -1,19 +1,26 @@
 package com.gub.application
 
 import com.gub.SERVER_PORT
-import com.gub.database.DatabaseFactory
-import com.gub.routes.dashboardRoutes
-import com.gub.routes.systemRoutes
-import io.ktor.serialization.kotlinx.json.json
+import com.gub.di.dashboardModule
+import com.gub.routes.analytics
+import com.gub.routes.dashboardRoute
+import com.gub.routes.monitoring
+import com.gub.routes.settings
+import com.gub.routes.system
+import com.gub.utils.InstantSerializer
+import com.gub.utils.json
+import io.ktor.http.ContentType.Application.Json
+import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
-import io.ktor.server.cio.CIO
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
-import oshi.SystemInfo
-import oshi.hardware.CentralProcessor.TickType
-import io.ktor.server.websocket.WebSockets
-import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.server.plugins.contentnegotiation.*
+import io.ktor.server.routing.*
+import io.ktor.server.websocket.*
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.modules.SerializersModule
+import org.koin.ktor.plugin.Koin
+import java.time.Instant
 
 fun main() {
     embeddedServer(
@@ -23,14 +30,26 @@ fun main() {
 }
 
 fun Application.module() {
+    // Websocket
     install(WebSockets)
+
+    // Configure Koin
+    install(Koin) {
+        modules(dashboardModule)
+    }
+
+    // Configure JSON serialization
     install(ContentNegotiation) {
         json()
     }
 
-    DatabaseFactory.init()
-//    createSchema()
+    // Configure routing
+    routing {
+        system()
 
-    systemRoutes()
-    dashboardRoutes()
+        settings()
+        analytics()
+        monitoring()
+        dashboardRoute()
+    }
 }

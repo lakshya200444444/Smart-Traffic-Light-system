@@ -1,12 +1,13 @@
 package com.gub.features.dashboard.data.repository
 
 import com.gub.core.domain.Response
+import com.gub.domain.models.dashboard.ModelLiveTraffic
 import com.gub.features.dashboard.data.remote.SystemOverviewApi
 import com.gub.features.dashboard.domain.repository.SystemOverviewRepository
 import com.gub.models.dashboard.overview.ModelSystemOverview
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.delay
 
 class SystemOverviewRepositoryImpl(
     private val api: SystemOverviewApi
@@ -35,12 +36,11 @@ class SystemOverviewRepositoryImpl(
         }
     }
 
-    override suspend fun updateSystemMetrics(overview: ModelSystemOverview): Result<Unit> {
+    override suspend fun getTrafficMatrics(): Response<ModelLiveTraffic> {
         return try {
-            api.updateSystemOverview(overview)
-            Result.success(Unit)
+            Response.Success(api.liveTrafficMatrics())
         } catch (e: Exception) {
-            Result.failure(e)
+            Response.Error(e.toString())
         }
     }
 }

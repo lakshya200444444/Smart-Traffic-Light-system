@@ -3,6 +3,7 @@ package com.gub.features.dashboard.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.gub.core.domain.Response
+import com.gub.domain.models.dashboard.ModelLiveTraffic
 import com.gub.features.dashboard.di.DashboardModule
 import com.gub.features.dashboard.domain.usecase.GetSystemOverviewUseCase
 import com.gub.features.dashboard.domain.usecase.UpdateSystemMetricsUseCase
@@ -23,6 +24,7 @@ class ViewModelDashboard(
 
     init {
         observeSystemOverview()
+        liveTrafficMatrics()
     }
 
     private fun observeSystemOverview() {
@@ -44,63 +46,24 @@ class ViewModelDashboard(
         }
     }
 
-    fun refreshData() {
-        viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isLoading = true)
-
-            getSystemOverviewUseCase().also { response ->
-                when(response) {
-                    is Response.Error -> {
-                        _uiState.value = _uiState.value.copy(
-                            isLoading = false,
-                            error = response.error
-                        )
-                    }
-                    Response.Loading -> TODO()
-                    is Response.Success -> {
-                        _uiState.value = _uiState.value.copy(
-                            isLoading = false,
-                            systemOverview = response.data,
-                            error = null
-                        )
-                    }
-                }
+    private fun liveTrafficMatrics() = viewModelScope.launch {
+        when(val res = updateSystemMetricsUseCase()) {
+            is Response.Error -> {}
+            Response.Loading -> {}
+            is Response.Success -> {
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    liveTrafficMatrics = res.data,
+                    error = null
+                )
             }
-
-//            getSystemOverviewUseCase().fold(
-//                onSuccess = { overview ->
-//                    _uiState.value = _uiState.value.copy(
-//                        isLoading = false,
-//                        systemOverview = overview,
-//                        error = null
-//                    )
-//                },
-//                onFailure = { exception ->
-//                    _uiState.value = _uiState.value.copy(
-//                        isLoading = false,
-//                        error = exception.message
-//                    )
-//                }
-//            )
-        }
-    }
-
-    fun updateMetrics(overview: ModelSystemOverview) {
-        viewModelScope.launch {
-            updateSystemMetricsUseCase(overview).fold(
-                onSuccess = {
-                    // Handle success
-                },
-                onFailure = { exception ->
-                    _uiState.value = _uiState.value.copy(error = exception.message)
-                }
-            )
         }
     }
 }
 
 data class SystemOverviewUiState(
     val isLoading: Boolean = true,
+    val liveTrafficMatrics: ModelLiveTraffic = ModelLiveTraffic(),
     val systemOverview: ModelSystemOverview = ModelSystemOverview(),
     val error: String? = null
 )

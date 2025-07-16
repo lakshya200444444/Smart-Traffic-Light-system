@@ -4,11 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -16,16 +12,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.gub.features.dashboard.domain.extension.aiResponseTimeSubText
-import com.gub.features.dashboard.domain.extension.aiResponseTimeValue
-import com.gub.features.dashboard.domain.extension.avgWaitTimeSubText
-import com.gub.features.dashboard.domain.extension.avgWaitTimeValue
-import com.gub.features.dashboard.domain.extension.currentFlowSubText
-import com.gub.features.dashboard.domain.extension.currentFlowValue
-import com.gub.features.dashboard.domain.extension.systemHealthSubText
-import com.gub.features.dashboard.domain.extension.systemHealthValue
-import com.gub.features.dashboard.domain.extension.weatherTempSubText
-import com.gub.features.dashboard.domain.extension.weatherTempValue
+import com.gub.features.dashboard.domain.extension.*
 import com.gub.features.dashboard.presentation.screens.components.SystemOverviewMetric
 import com.gub.models.dashboard.overview.ModelSystemOverview
 

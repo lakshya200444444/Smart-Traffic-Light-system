@@ -21,10 +21,12 @@ jobs:
       - name: SSH into VM and deploy
         uses: appleboy/ssh-action@v1.0.0
         with:
-          host: 35.240.216.70
+          host: 34.87.172.238
           username: sourav_0_alim
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
+            set -euxo pipefail
+
             echo "📁 Checking project directory..."
             if [ ! -d ~/Smart-Traffic-Management-System ]; then
               echo "📥 Cloning project..."
@@ -32,7 +34,7 @@ jobs:
             fi
 
             echo "🔄 Navigating to project directory..."
-            cd ~/Smart-Traffic-Management-System || exit 1
+            cd ~/Smart-Traffic-Management-System
 
             echo "📦 Pulling latest code..."
             git pull origin master

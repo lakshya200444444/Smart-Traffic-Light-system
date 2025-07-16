@@ -6,16 +6,7 @@
 package com.gub.features.monitoring.data.network
 
 import com.gub.app.Const.STREAM_URL
-import com.gub.features.monitoring.domain.model.BroadcastControlRequest
-import com.gub.features.monitoring.domain.model.ConfigUpdateRequest
-import com.gub.features.monitoring.domain.model.ConfigurationStats
-import com.gub.features.monitoring.domain.model.ControlResponse
-import com.gub.features.monitoring.domain.model.DetectionControlRequest
-import com.gub.features.monitoring.domain.model.DetectionStats
-import com.gub.features.monitoring.domain.model.DeviceControlRequest
-import com.gub.features.monitoring.domain.model.HealthResponse
-import com.gub.features.monitoring.domain.model.PlaybackControlRequest
-import com.gub.features.monitoring.domain.model.StatsResponse
+import com.gub.features.monitoring.domain.model.*
 import com.gub.utils.Constants
 import io.ktor.client.*
 import io.ktor.client.call.*

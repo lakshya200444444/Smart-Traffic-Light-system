@@ -3,8 +3,6 @@ package com.gub.features.dashboard.data.repository
 import com.gub.app.Const.SERVER_URL
 import com.gub.core.domain.Response
 import com.gub.models.core.ModelSystemStatus
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.java_websocket.client.WebSocketClient
 import org.java_websocket.handshake.ServerHandshake

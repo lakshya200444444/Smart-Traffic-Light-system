@@ -1,85 +1,19 @@
 package com.gub.features.monitoring.presentation.components
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxScope
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowForward
-import androidx.compose.material.icons.automirrored.filled.DirectionsBike
-import androidx.compose.material.icons.automirrored.filled.TrendingDown
-import androidx.compose.material.icons.automirrored.filled.TrendingFlat
-import androidx.compose.material.icons.automirrored.filled.TrendingUp
-import androidx.compose.material.icons.filled.Analytics
-import androidx.compose.material.icons.filled.ArrowDownward
-import androidx.compose.material.icons.filled.ArrowForward
-import androidx.compose.material.icons.filled.ArrowUpward
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.DirectionsBike
-import androidx.compose.material.icons.filled.DirectionsBus
-import androidx.compose.material.icons.filled.DirectionsCar
-import androidx.compose.material.icons.filled.Error
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.LocalHospital
-import androidx.compose.material.icons.filled.LocalShipping
-import androidx.compose.material.icons.filled.LocalTaxi
-import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.NotificationsActive
-import androidx.compose.material.icons.filled.NotificationsOff
-import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material.icons.filled.Schedule
-import androidx.compose.material.icons.filled.Speed
-import androidx.compose.material.icons.filled.Thermostat
-import androidx.compose.material.icons.filled.Traffic
-import androidx.compose.material.icons.filled.TrendingDown
-import androidx.compose.material.icons.filled.TrendingFlat
-import androidx.compose.material.icons.filled.TrendingUp
-import androidx.compose.material.icons.filled.TurnLeft
-import androidx.compose.material.icons.filled.TurnRight
-import androidx.compose.material.icons.filled.TwoWheeler
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.Warning
-import androidx.compose.material3.Badge
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.FilterChip
-import androidx.compose.material3.FilterChipDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -88,20 +22,24 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.unit.times
-import com.gub.core.ui.components.PulsingDot
+import com.gub.domain.models.monitoring.ModelLiveSignal
 import com.gub.features.monitoring.presentation.TrafficLightState
+import com.gub.features.monitoring.viewModel.MonitoringUiState
+import com.gub.features.monitoring.viewModel.ViewModelMonitoring
 import kotlinx.coroutines.delay
-import kotlin.math.cos
-import kotlin.math.sin
+import kotlinx.coroutines.flow.StateFlow
+import org.jetbrains.compose.ui.tooling.preview.Preview
 import kotlin.random.Random
 
 @Composable
-fun IntersectionOverviewCard(modifier: Modifier = Modifier) {
+fun IntersectionOverviewCard(
+    modifier: Modifier = Modifier,
+    viewModelMonitoring: ViewModelMonitoring,
+    vehicleCount: String,
+    intersectionName: MutableState<String>
+) {
 
     var selectedView by remember { mutableStateOf("Live") }
 
@@ -114,18 +52,22 @@ fun IntersectionOverviewCard(modifier: Modifier = Modifier) {
             modifier = Modifier.padding(24.dp)
         ) {
             // Modern Header
-            ModernHeader()
+            ModernHeader(intersectionName = intersectionName)
 
             Spacer(modifier = Modifier.height(20.dp))
 
             // View Selector
-            ViewSelector(selectedView) { selectedView = it }
+//            ViewSelector(selectedView) { selectedView = it }
 
             Spacer(modifier = Modifier.height(24.dp))
 
             // Main Intersection Display
             when (selectedView) {
-                "Live" -> LiveIntersectionView()
+                "Live" -> LiveIntersectionView(
+                    viewModelMonitoring.uiState,
+                    vehicleCount = vehicleCount,
+                    intersectionName = intersectionName
+                )
                 "Stats" -> StatsView()
                 "History" -> HistoryView()
             }
@@ -139,7 +81,7 @@ fun IntersectionOverviewCard(modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun ModernHeader() {
+private fun ModernHeader(intersectionName: MutableState<String>) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -151,7 +93,7 @@ private fun ModernHeader() {
             ) {
                 Box(
                     modifier = Modifier
-                        .size(32.dp)
+                        .size(28.dp)
                         .background(
                             Brush.linearGradient(
                                 colors = listOf(Color(0xFF00D4FF), Color(0xFF0099CC))
@@ -164,22 +106,22 @@ private fun ModernHeader() {
                         Icons.Default.Traffic,
                         contentDescription = null,
                         tint = Color.White,
-                        modifier = Modifier.size(18.dp)
+                        modifier = Modifier.size(16.dp)
                     )
                 }
-                Spacer(modifier = Modifier.width(12.dp))
+                Spacer(modifier = Modifier.width(16.dp))
                 Column {
                     Text(
-                        "Mirpur 10",
+                        text = intersectionName.value,
                         color = MaterialTheme.colorScheme.onSurface,
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold
                     )
-                    Text(
-                        "Times Square District • User: Alims-Repo",
-                        color = MaterialTheme.colorScheme.onSurface.copy(0.75F),
-                        fontSize = 11.sp
-                    )
+//                    Text(
+//                        "Times Square District • User: Alims-Repo",
+//                        color = MaterialTheme.colorScheme.onSurface.copy(0.75F),
+//                        fontSize = 11.sp
+//                    )
                 }
             }
         }
@@ -221,20 +163,14 @@ private fun StatusBadge() {
                     )
             )
             Spacer(modifier = Modifier.width(8.dp))
-            Column {
-                Text(
-                    "ACTIVE",
-                    color = Color(0xFF10B981),
-                    fontSize = 10.sp,
-                    fontWeight = FontWeight.Bold,
-                    letterSpacing = 0.5.sp
-                )
-                Text(
-                    "2025-06-23 09:18:36",
-                    color = Color(0xFF6B7280),
-                    fontSize = 8.sp
-                )
-            }
+
+            Text(
+                "ACTIVE",
+                color = Color(0xFF10B981),
+                fontSize = 10.sp,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = 0.5.sp
+            )
         }
     }
 }
@@ -289,7 +225,11 @@ private fun ViewSelector(selectedView: String, onViewChange: (String) -> Unit) {
 }
 
 @Composable
-private fun LiveIntersectionView() {
+private fun LiveIntersectionView(
+    viewModelMonitoring: StateFlow<MonitoringUiState>,
+    vehicleCount: String,
+    intersectionName: MutableState<String>
+) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -312,7 +252,10 @@ private fun LiveIntersectionView() {
         SmartTrafficLights()
 
         // Dynamic Vehicles
-        DynamicVehicleFlow()
+        DynamicVehicleFlow(
+            viewModelMonitoring,
+            vehicleCount = vehicleCount
+        )
 
         // Traffic Info Overlay
 //        TrafficInfoOverlay()
@@ -435,6 +378,12 @@ private fun BoxScope.ModernRoadNetwork() {
 }
 
 @Composable
+@Preview
+fun PreviewSmartTrafficLights() {
+    SmartTrafficLights()
+}
+
+@Composable
 private fun SmartTrafficLights() {
     var currentPhase by remember { mutableStateOf(TrafficPhase.NS_GREEN) }
     var timeRemaining by remember { mutableStateOf(45) }
@@ -467,13 +416,10 @@ private fun SmartTrafficLights() {
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        // Corrected signal positions at intersection corners
-
-        // North Signal (for southbound traffic from 42nd St)
         SmartSignalBox(
             modifier = Modifier
                 .align(Alignment.TopCenter)
-                .offset(x = 25.dp, y = 50.dp),
+                .offset(x = 60.dp, y = 0.dp),
             direction = "N",
             state = when (currentPhase) {
                 TrafficPhase.NS_GREEN -> TrafficLightState.GREEN
@@ -501,7 +447,7 @@ private fun SmartTrafficLights() {
         SmartSignalBox(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .offset(x = (-25).dp, y = (-50).dp),
+                .offset(x = (-60).dp, y = (-0).dp),
             direction = "S",
             state = when (currentPhase) {
                 TrafficPhase.NS_GREEN -> TrafficLightState.GREEN
@@ -614,21 +560,22 @@ private fun SmartSignalBox(
 }
 
 @Composable
-private fun DynamicVehicleFlow() {
-    var vehicles by remember {
-        mutableStateOf(
-            generateRandomVehicles()
-        )
+fun DynamicVehicleFlow(viewModelMonitoring: StateFlow<MonitoringUiState>, vehicleCount: String) {
+    val uiState by viewModelMonitoring.collectAsState()
+
+    var vehicles by remember { mutableStateOf<List<Vehicle>>(emptyList()) }
+
+    LaunchedEffect(uiState.liveSignal) {
+        uiState.liveSignal?.let { signal ->
+            vehicles = generateVehiclesFromSignal(signal)
+        }
     }
 
     LaunchedEffect(Unit) {
         while (true) {
             vehicles = vehicles.map { vehicle ->
                 updateVehiclePosition(vehicle)
-            }.filter { it.position < 1.2f } +
-                    if (Random.nextFloat() < 0.08f) {
-                        listOf(generateRandomVehicle())
-                    } else emptyList()
+            }.filter { it.position < 1.2f }
 
             delay(100)
         }
@@ -637,10 +584,50 @@ private fun DynamicVehicleFlow() {
     Box(modifier = Modifier.fillMaxSize()) {
         vehicles.forEach { vehicle ->
             val (x, y) = getVehicleScreenPosition(vehicle)
-
             ModernVehicle(
                 modifier = Modifier.offset(x.dp, y.dp),
                 vehicle = vehicle
+            )
+        }
+    }
+}
+
+fun generateVehiclesFromSignal(signal: ModelLiveSignal): List<Vehicle> {
+    val roadToLanes = mapOf(
+        VehicleLane.BROADWAY_EAST_1 to signal.east,
+        VehicleLane.BROADWAY_EAST_2 to signal.east,
+        VehicleLane.BROADWAY_EAST_3 to signal.east,
+
+        VehicleLane.BROADWAY_WEST_1 to signal.west,
+        VehicleLane.BROADWAY_WEST_2 to signal.west,
+        VehicleLane.BROADWAY_WEST_3 to signal.west,
+
+        VehicleLane.STREET_42_SOUTH_1 to signal.south,
+        VehicleLane.STREET_42_SOUTH_2 to signal.south,
+        VehicleLane.STREET_42_SOUTH_3 to signal.south,
+
+        VehicleLane.STREET_42_NORTH_1 to signal.north,
+        VehicleLane.STREET_42_NORTH_2 to signal.north,
+        VehicleLane.STREET_42_NORTH_3 to signal.north,
+    )
+
+    var idCounter = 0
+
+    return roadToLanes.flatMap { (lane, road) ->
+        val count = when (road.type) {
+            ModelLiveSignal.Road.SignalType.GREEN -> road.vehicleCount / 3
+            else -> road.vehicleCount
+        }.coerceAtMost(5) // limit per lane
+
+        List(count) {
+            val type = VehicleType.values().random()
+            Vehicle(
+                id = idCounter++,
+                lane = lane,
+                type = type,
+                position = 0f,
+                speed = Random.nextFloat() * 0.01f + 0.005f,
+                color = type.color
             )
         }
     }
@@ -654,6 +641,7 @@ data class Vehicle(
     val speed: Float,
     val color: Color
 )
+
 
 enum class VehicleLane {
     BROADWAY_EAST_1, BROADWAY_EAST_2, BROADWAY_EAST_3,  // Left to right movement

@@ -21,6 +21,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.gub.core.ui.components.PulsingDot
+import com.gub.features.monitoring.presentation.components.TopBarMonitoring
+import com.gub.features.settings.presentation.components.GeneralSettingsSection
+import com.gub.features.settings.presentation.components.NotificationSettingsSection
+import com.gub.features.settings.presentation.components.TopBarSettings
+import com.gub.utils.UiCalculations.toDp
+import dev.chrisbanes.haze.hazeSource
+import dev.chrisbanes.haze.rememberHazeState
 
 @Composable
 fun Settings() {
@@ -29,69 +36,37 @@ fun Settings() {
 
     val settingsTabs = listOf("General", "Notifications", "AI & Automation", "Data & Privacy", "System")
 
+    val hazeState = rememberHazeState()
+    var height by remember { mutableStateOf(0) }
+
     LazyColumn(
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        modifier = Modifier
+            .fillMaxSize()
+            .hazeSource(hazeState),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        contentPadding = PaddingValues(top = height.toDp() + 24.dp, start = 24.dp, end = 24.dp, bottom = 24.dp)
     ) {
         item {
-            Column {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Column {
-                        Text(
-                            "Settings & Configuration",
-                            fontSize = 28.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.White
-                        )
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.padding(top = 4.dp)
-                        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                settingsTabs.forEachIndexed { index, tab ->
+                    FilterChip(
+                        onClick = { selectedSettingsTab = index },
+                        label = {
                             Text(
-                                "Last updated: $currentTime",
+                                tab,
                                 fontSize = 11.sp,
-                                color = Color.Gray
+                                color = if (selectedSettingsTab == index) Color.White else Color.Gray
                             )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Icon(
-                                Icons.Default.Settings,
-                                contentDescription = null,
-                                tint = Color(0xFF4CAF50),
-                                modifier = Modifier.size(12.dp)
-                            )
-                        }
-                    }
-
-                    com.gub.core.ui.components.UserProfileChip()
-                }
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                // Settings Tab Navigation
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    settingsTabs.forEachIndexed { index, tab ->
-                        FilterChip(
-                            onClick = { selectedSettingsTab = index },
-                            label = {
-                                Text(
-                                    tab,
-                                    fontSize = 11.sp,
-                                    color = if (selectedSettingsTab == index) Color.White else Color.Gray
-                                )
-                            },
-                            selected = selectedSettingsTab == index,
-                            colors = FilterChipDefaults.filterChipColors(
-                                selectedContainerColor = Color(0xFF2E7D32),
-                                containerColor = Color(0xFF161B22)
-                            )
+                        },
+                        selected = selectedSettingsTab == index,
+                        colors = FilterChipDefaults.filterChipColors(
+                            selectedContainerColor = Color(0xFF2E7D32),
+                            containerColor = Color(0xFF161B22)
                         )
-                    }
+                    )
                 }
             }
         }
@@ -120,37 +95,22 @@ fun Settings() {
             SettingsFooter()
         }
     }
+
+    TopBarSettings(
+        hazeState,
+        topBarHeight = { height = it }
+    )
 }
 
-@Composable
-fun GeneralSettingsSection() {
-    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-        // User Profile Settings
-        UserProfileSettingsCard()
 
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            DashboardPreferencesCard(modifier = Modifier.weight(1f))
-            DisplaySettingsCard(modifier = Modifier.weight(1f))
-        }
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            LanguageRegionCard(modifier = Modifier.weight(1f))
-            AccessibilityCard(modifier = Modifier.weight(1f))
-        }
-    }
-}
 
 @Composable
 fun UserProfileSettingsCard() {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF161B22)),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        ),
         shape = RoundedCornerShape(12.dp)
     ) {
         Column(
@@ -163,7 +123,7 @@ fun UserProfileSettingsCard() {
             ) {
                 Text(
                     "User Profile",
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -285,7 +245,9 @@ fun DashboardPreferencesCard(modifier: Modifier = Modifier) {
 
     Card(
         modifier = modifier,
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF161B22)),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        ),
         shape = RoundedCornerShape(12.dp)
     ) {
         Column(
@@ -293,7 +255,7 @@ fun DashboardPreferencesCard(modifier: Modifier = Modifier) {
         ) {
             Text(
                 "Dashboard Preferences",
-                color = Color.White,
+                color = MaterialTheme.colorScheme.onSurface,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold
             )
@@ -325,32 +287,32 @@ fun DashboardPreferencesCard(modifier: Modifier = Modifier) {
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            Text(
-                "Default Dashboard Tab",
-                color = Color.Gray,
-                fontSize = 12.sp
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                listOf("Overview", "Analytics", "Monitoring").forEach { tab ->
-                    FilterChip(
-                        onClick = { },
-                        label = {
-                            Text(
-                                tab,
-                                fontSize = 10.sp,
-                                color = if (tab == "Overview") Color.White else Color.Gray
-                            )
-                        },
-                        selected = tab == "Overview",
-                        colors = FilterChipDefaults.filterChipColors(
-                            selectedContainerColor = Color(0xFF2E7D32),
-                            containerColor = Color(0xFF0D1117)
-                        )
-                    )
-                }
-            }
+//            Text(
+//                "Default Dashboard Tab",
+//                color = Color.Gray,
+//                fontSize = 12.sp
+//            )
+//            Spacer(modifier = Modifier.height(4.dp))
+//
+//            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+//                listOf("Overview", "Analytics", "Monitoring").forEach { tab ->
+//                    FilterChip(
+//                        onClick = { },
+//                        label = {
+//                            Text(
+//                                tab,
+//                                fontSize = 10.sp,
+//                                color = if (tab == "Overview") Color.White else Color.Gray
+//                            )
+//                        },
+//                        selected = tab == "Overview",
+//                        colors = FilterChipDefaults.filterChipColors(
+//                            selectedContainerColor = Color(0xFF2E7D32),
+//                            containerColor = Color(0xFF0D1117)
+//                        )
+//                    )
+//                }
+//            }
         }
     }
 }
@@ -398,7 +360,9 @@ fun DisplaySettingsCard(modifier: Modifier = Modifier) {
 
     Card(
         modifier = modifier,
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF161B22)),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        ),
         shape = RoundedCornerShape(12.dp)
     ) {
         Column(
@@ -406,7 +370,7 @@ fun DisplaySettingsCard(modifier: Modifier = Modifier) {
         ) {
             Text(
                 "Display Settings",
-                color = Color.White,
+                color = MaterialTheme.colorScheme.onSurface,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold
             )
@@ -620,27 +584,6 @@ fun AccessibilityCard(modifier: Modifier = Modifier) {
                     }
                 }
             }
-        }
-    }
-}
-
-@Composable
-fun NotificationSettingsSection() {
-    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            AlertNotificationsCard(modifier = Modifier.weight(1f))
-            SystemNotificationsCard(modifier = Modifier.weight(1f))
-        }
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            NotificationChannelsCard(modifier = Modifier.weight(1f))
-            QuietHoursCard(modifier = Modifier.weight(1f))
         }
     }
 }
@@ -2657,7 +2600,7 @@ fun SettingItem(
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 title,
-                color = Color.White,
+                color = MaterialTheme.colorScheme.onSurface,
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Medium
             )

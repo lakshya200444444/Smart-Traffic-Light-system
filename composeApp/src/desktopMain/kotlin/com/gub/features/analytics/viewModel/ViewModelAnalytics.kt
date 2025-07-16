@@ -3,16 +3,21 @@ package com.gub.features.analytics.viewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.gub.core.domain.Response
+import com.gub.domain.models.analytics.ModelTrafficVolume
+import com.gub.features.analytics.di.AnalyticsModule
 import com.gub.features.analytics.domain.model.*
-import com.gub.models.analytics.*
+import com.gub.features.analytics.domain.usecase.UseCaseTrafficVolume
+import com.gub.models.analytics.ModelPrediction
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.*
 import kotlin.random.Random
 
-class ViewModelAnalytics : ViewModel() {
+class ViewModelAnalytics(
+    private val useCaseTrafficVolume: UseCaseTrafficVolume = AnalyticsModule.useCaseTrafficVolume
+) : ViewModel() {
 
     private val _predictiveAnalytics = MutableStateFlow<Response<List<ModelPrediction>>>(Response.Loading)
     val predictiveAnalytics: StateFlow<Response<List<ModelPrediction>>> = _predictiveAnalytics.asStateFlow()
@@ -23,8 +28,8 @@ class ViewModelAnalytics : ViewModel() {
     private val _trafficVolumeData = MutableStateFlow<Response<List<TrafficVolumeData>>>(Response.Loading)
     val trafficVolumeData: StateFlow<Response<List<TrafficVolumeData>>> = _trafficVolumeData.asStateFlow()
 
-    private val _chartData = MutableStateFlow<Response<List<ChartDataPoint>>>(Response.Loading)
-    val chartData: StateFlow<Response<List<ChartDataPoint>>> = _chartData.asStateFlow()
+    private val _chartData = MutableStateFlow<Response<ModelTrafficVolume>>(Response.Loading)
+    val chartData: StateFlow<Response<ModelTrafficVolume>> = _chartData.asStateFlow()
 
     private val _exportInfo = MutableStateFlow<Response<ExportInfo>>(Response.Loading)
     val exportInfo: StateFlow<Response<ExportInfo>> = _exportInfo.asStateFlow()
@@ -45,7 +50,7 @@ class ViewModelAnalytics : ViewModel() {
     val isRefreshing: StateFlow<Boolean> = _isRefreshing.asStateFlow()
 
     // Current time: 2025-06-29 05:24:38 UTC
-    private val currentTimeMillis = 1750851878000L // 2025-06-29 05:24:38 UTC in milliseconds
+    private val currentTimeMillis = System.currentTimeMillis() // 2025-06-29 05:24:38 UTC in milliseconds
 
     init {
         loadInitialData()
@@ -120,36 +125,40 @@ class ViewModelAnalytics : ViewModel() {
         viewModelScope.launch {
             try {
                 delay(700L)
-                val chartPoints = mutableListOf<ChartDataPoint>()
-                val currentHour = 5 // Current time is 05:24
+//                val chartPoints = mutableListOf<ChartDataPoint>()
+//                val currentHour = 5 // Current time is 05:24
+//
+//                // Generate 24 hours of data starting from midnight
+//                for (hour in 0..23) {
+//                    val timestamp = currentTimeMillis - (currentHour - hour) * 3600000L
+//                    val baseValue = when (hour) {
+//                        in 0..5 -> Random.nextInt(150, 300) // Very early morning
+//                        in 6..9 -> Random.nextInt(800, 1200) // Morning rush
+//                        in 10..11 -> Random.nextInt(400, 600) // Mid-morning
+//                        in 12..13 -> Random.nextInt(600, 900) // Lunch
+//                        in 14..16 -> Random.nextInt(500, 700) // Afternoon
+//                        in 17..19 -> Random.nextInt(900, 1400) // Evening rush
+//                        in 20..23 -> Random.nextInt(300, 500) // Evening
+//                        else -> Random.nextInt(200, 400)
+//                    }
+//
+//                    chartPoints.add(
+//                        ChartDataPoint(
+//                            hour = hour,
+//                            value = if (hour <= currentHour) baseValue else baseValue + Random.nextInt(-50, 100), // Past vs predicted
+//                            prediction = hour > currentHour, // Future hours are predictions
+//                            timestamp = timestamp,
+//                            label = String.format("%02d:00", hour),
+//                            color = if (hour > currentHour) "#FF9800" else "#2196F3"
+//                        )
+//                    )
+//                }
 
-                // Generate 24 hours of data starting from midnight
-                for (hour in 0..23) {
-                    val timestamp = currentTimeMillis - (currentHour - hour) * 3600000L
-                    val baseValue = when (hour) {
-                        in 0..5 -> Random.nextInt(150, 300) // Very early morning
-                        in 6..9 -> Random.nextInt(800, 1200) // Morning rush
-                        in 10..11 -> Random.nextInt(400, 600) // Mid morning
-                        in 12..13 -> Random.nextInt(600, 900) // Lunch
-                        in 14..16 -> Random.nextInt(500, 700) // Afternoon
-                        in 17..19 -> Random.nextInt(900, 1400) // Evening rush
-                        in 20..23 -> Random.nextInt(300, 500) // Evening
-                        else -> Random.nextInt(200, 400)
-                    }
 
-                    chartPoints.add(
-                        ChartDataPoint(
-                            hour = hour,
-                            value = if (hour <= currentHour) baseValue else baseValue + Random.nextInt(-50, 100), // Past vs predicted
-                            prediction = hour > currentHour, // Future hours are predictions
-                            timestamp = timestamp,
-                            label = String.format("%02d:00", hour),
-                            color = if (hour > currentHour) "#FF9800" else "#2196F3"
-                        )
-                    )
-                }
-
-                _chartData.value = Response.Success(chartPoints)
+                print("DATA -> ${useCaseTrafficVolume(ModelTrafficVolume.TrafficVolumeType.WEEKLY)}")
+                _chartData.value = Response.Success(
+                    useCaseTrafficVolume(ModelTrafficVolume.TrafficVolumeType.WEEKLY)
+                )
             } catch (e: Exception) {
                 _chartData.value = Response.Error("Failed to load chart data: ${e.message}")
             }

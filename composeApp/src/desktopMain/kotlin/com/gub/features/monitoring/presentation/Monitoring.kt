@@ -1,6 +1,5 @@
 package com.gub.features.monitoring.presentation
 
-import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
@@ -14,18 +13,20 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.gub.core.ui.components.PulsingDot
-import com.gub.features.dashboard.presentation.components.TopBarDashboard
+import com.gub.features.monitoring.data.network.LiveFeedManager
 import com.gub.features.monitoring.presentation.components.IntersectionOverviewCard
 import com.gub.features.monitoring.presentation.components.LiveCameraFeedCard
 import com.gub.features.monitoring.presentation.components.TopBarMonitoring
+import com.gub.features.monitoring.viewModel.ViewModelMonitoring
 import com.gub.utils.UiCalculations.toDp
 import dev.chrisbanes.haze.hazeSource
 import dev.chrisbanes.haze.rememberHazeState
@@ -39,25 +40,14 @@ fun Monitoring() {
     val hazeState = rememberHazeState()
     var height by remember { mutableStateOf(0) }
 
-//    AnimatedContent(
-//        targetState = isCameraExpanded
-//    ) {
-//        if (it) {
-//            if (isCameraExpanded)
-//                // Full width camera feed when expanded
-//                LiveCameraFeedCard(
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .animateContentSize(
-//                            animationSpec = tween(300)
-//                        ),
-//                    isExpanded = true,
-//                    onToggleExpand = { isCameraExpanded = !isCameraExpanded }
-//                )
-//        } else {
-//
-//        }
-//    }
+    val intersectionName = remember { mutableStateOf("Mirpur 10") }
+
+    val viewModelMonitoring = remember { ViewModelMonitoring() }
+
+    val liveFeedManager = remember { LiveFeedManager() }
+    var currentFrame by remember { mutableStateOf<ImageBitmap?>(null) }
+    var vehicleCount by remember { mutableStateOf("") }
+    var frameError by remember { mutableStateOf<String?>(null) }
 
     LazyColumn(
         modifier = Modifier
@@ -76,6 +66,9 @@ fun Monitoring() {
                             animationSpec = tween(300)
                         ),
                     isExpanded = true,
+                    currentFrame = currentFrame,
+                    vehicleCount = vehicleCount,
+                    frameError = frameError,
                     onToggleExpand = { isCameraExpanded = !isCameraExpanded }
                 )
             }
@@ -85,7 +78,13 @@ fun Monitoring() {
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    IntersectionOverviewCard(modifier = Modifier.weight(2f))
+                    IntersectionOverviewCard(
+                        modifier = Modifier.weight(2f),
+                        viewModelMonitoring = viewModelMonitoring,
+                        vehicleCount = vehicleCount,
+                        intersectionName = intersectionName
+                    )
+
                     TrafficControlPanelCard(modifier = Modifier.weight(1f))
                 }
             }
@@ -106,8 +105,10 @@ fun Monitoring() {
                             .animateContentSize(
                                 animationSpec = tween(300)
                             ),
-                        isExpanded = false,
-                        onToggleExpand = { isCameraExpanded = !isCameraExpanded }
+                        currentFrame = currentFrame,
+                        vehicleCount = vehicleCount,
+                        frameError = frameError,
+                        onToggleExpand = { isCameraExpanded = !isCameraExpanded },
                     )
                 }
             }
@@ -129,6 +130,17 @@ fun Monitoring() {
         hazeState,
         topBarHeight = { height = it }
     )
+
+    LaunchedEffect(Unit) {
+        try {
+            liveFeedManager.streamVideoAndProcess("1.mp4") { frame, count ->
+                currentFrame = frame
+                vehicleCount = count
+            }
+        } catch (e: Exception) {
+            frameError = e.message
+        }
+    }
 }
 
 // ... rest of your existing composables remain the same ...

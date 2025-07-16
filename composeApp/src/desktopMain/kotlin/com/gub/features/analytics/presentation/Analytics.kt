@@ -1,11 +1,9 @@
 package com.gub.features.analytics.presentation
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -13,11 +11,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.gub.core.domain.Response
@@ -27,11 +23,9 @@ import com.gub.features.analytics.presentation.components.InteractiveTrafficVolu
 import com.gub.features.analytics.presentation.components.PredictiveAnalyticsCard
 import com.gub.features.analytics.presentation.components.TopBarAnalytics
 import com.gub.features.analytics.viewModel.ViewModelAnalytics
-import com.gub.models.analytics.*
 import com.gub.utils.UiCalculations.toDp
 import dev.chrisbanes.haze.hazeSource
 import dev.chrisbanes.haze.rememberHazeState
-import kotlinx.coroutines.delay
 
 @Composable
 fun Analytics() {
