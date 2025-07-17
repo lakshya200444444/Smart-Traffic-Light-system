@@ -27,12 +27,12 @@ fun GeneralSettingsSection() {
             DisplaySettingsCard(modifier = Modifier.weight(1f))
         }
 
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            LanguageRegionCard(modifier = Modifier.weight(1f))
-            AccessibilityCard(modifier = Modifier.weight(1f))
-        }
+//        Row(
+//            modifier = Modifier.fillMaxWidth(),
+//            horizontalArrangement = Arrangement.spacedBy(16.dp)
+//        ) {
+//            LanguageRegionCard(modifier = Modifier.weight(1f))
+//            AccessibilityCard(modifier = Modifier.weight(1f))
+//        }
     }
 }

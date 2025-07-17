@@ -15,6 +15,7 @@ object SignalingAlgorithm {
         val nextGreenPhase = when (state.currentPhase) {
             TrafficPhase.NS_GREEN, TrafficPhase.NS_YELLOW -> TrafficPhase.EW_GREEN
             TrafficPhase.EW_GREEN, TrafficPhase.EW_YELLOW -> TrafficPhase.NS_GREEN
+            TrafficPhase.ALL_RED -> TrafficPhase.NS_GREEN
         }
 
         // Step 2: Dynamically calculate green duration based on vehicle count & wait time
@@ -38,6 +39,7 @@ object SignalingAlgorithm {
             TrafficPhase.NS_YELLOW -> nextGreenPhase to greenDuration
             TrafficPhase.EW_GREEN -> TrafficPhase.EW_YELLOW to 4
             TrafficPhase.EW_YELLOW -> nextGreenPhase to greenDuration
+            TrafficPhase.ALL_RED -> TrafficPhase.EW_YELLOW to 4
         }
     }
 
@@ -51,6 +53,7 @@ object SignalingAlgorithm {
             TrafficPhase.NS_YELLOW -> TrafficPhase.EW_GREEN to 35
             TrafficPhase.EW_GREEN -> TrafficPhase.EW_YELLOW to 4
             TrafficPhase.EW_YELLOW -> TrafficPhase.NS_GREEN to 45
+            TrafficPhase.ALL_RED -> TrafficPhase.NS_GREEN to 45
         }
     }
 }

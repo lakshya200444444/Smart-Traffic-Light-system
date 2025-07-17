@@ -363,43 +363,43 @@ private fun BoxScope.ModernRoadNetwork() {
     }
 
     // Street name labels with modern styling
-    Card(
-        modifier = Modifier
-            .align(Alignment.CenterStart)
-            .padding(start = 20.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = Color.Black.copy(alpha = 0.8f)
-        ),
-        shape = RoundedCornerShape(8.dp)
-    ) {
-        Text(
-            "BROADWAY",
-            color = Color(0xFF00D4FF),
-            fontSize = 11.sp,
-            fontWeight = FontWeight.Bold,
-            letterSpacing = 1.sp,
-            modifier = Modifier.padding(8.dp, 4.dp)
-        )
-    }
+//    Card(
+//        modifier = Modifier
+//            .align(Alignment.CenterStart)
+//            .padding(start = 20.dp),
+//        colors = CardDefaults.cardColors(
+//            containerColor = Color.Black.copy(alpha = 0.8f)
+//        ),
+//        shape = RoundedCornerShape(8.dp)
+//    ) {
+//        Text(
+//            "BROADWAY",
+//            color = Color(0xFF00D4FF),
+//            fontSize = 11.sp,
+//            fontWeight = FontWeight.Bold,
+//            letterSpacing = 1.sp,
+//            modifier = Modifier.padding(8.dp, 4.dp)
+//        )
+//    }
 
-    Card(
-        modifier = Modifier
-            .align(Alignment.TopCenter)
-            .padding(top = 20.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = Color.Black.copy(alpha = 0.8f)
-        ),
-        shape = RoundedCornerShape(8.dp)
-    ) {
-        Text(
-            "42ND ST",
-            color = Color(0xFF00D4FF),
-            fontSize = 11.sp,
-            fontWeight = FontWeight.Bold,
-            letterSpacing = 1.sp,
-            modifier = Modifier.padding(8.dp, 4.dp)
-        )
-    }
+//    Card(
+//        modifier = Modifier
+//            .align(Alignment.TopCenter)
+//            .padding(top = 20.dp),
+//        colors = CardDefaults.cardColors(
+//            containerColor = Color.Black.copy(alpha = 0.8f)
+//        ),
+//        shape = RoundedCornerShape(8.dp)
+//    ) {
+//        Text(
+//            "42ND ST",
+//            color = Color(0xFF00D4FF),
+//            fontSize = 11.sp,
+//            fontWeight = FontWeight.Bold,
+//            letterSpacing = 1.sp,
+//            modifier = Modifier.padding(8.dp, 4.dp)
+//        )
+//    }
 }
 
 @Composable
@@ -677,6 +677,13 @@ fun shouldVehicleMove(vehicle: Vehicle, currentPhase: TrafficPhase): Boolean {
                 VehicleLane.WEST_1, VehicleLane.WEST_2, VehicleLane.WEST_3
             )
         }
+
+        TrafficPhase.ALL_RED -> {
+            vehicle.lane in listOf(
+                VehicleLane.EAST_1, VehicleLane.EAST_2, VehicleLane.EAST_3,
+                VehicleLane.WEST_1, VehicleLane.WEST_2, VehicleLane.WEST_3
+            )
+        }
     }
 }
 
@@ -710,6 +717,18 @@ fun generateVehiclesFromSignal(signal: ModelLiveSignal, vehicleCountJson: String
             Pair(green, red)
         }
         TrafficPhase.EW_GREEN, TrafficPhase.EW_YELLOW -> {
+            val green = listOf(
+                VehicleLane.EAST_1, VehicleLane.EAST_2, VehicleLane.EAST_3,
+                VehicleLane.WEST_1, VehicleLane.WEST_2, VehicleLane.WEST_3
+            )
+            val red = listOf(
+                VehicleLane.NORTH_1, VehicleLane.NORTH_2, VehicleLane.NORTH_3,
+                VehicleLane.SOUTH_1, VehicleLane.SOUTH_2, VehicleLane.SOUTH_3
+            )
+            Pair(green, red)
+        }
+
+        TrafficPhase.ALL_RED -> {
             val green = listOf(
                 VehicleLane.EAST_1, VehicleLane.EAST_2, VehicleLane.EAST_3,
                 VehicleLane.WEST_1, VehicleLane.WEST_2, VehicleLane.WEST_3
@@ -942,6 +961,7 @@ private fun getCurrentPhaseColor(phase: TrafficPhase): Color {
         TrafficPhase.NS_YELLOW -> Color(0xFFFBBF24)
         TrafficPhase.EW_GREEN -> Color(0xFF10B981)
         TrafficPhase.EW_YELLOW -> Color(0xFFFBBF24)
+        TrafficPhase.ALL_RED -> Color(0xFFE20000)
     }
 }
 
@@ -949,6 +969,7 @@ private fun getCurrentPhaseText(phase: TrafficPhase): String {
     return when (phase) {
         TrafficPhase.NS_GREEN, TrafficPhase.NS_YELLOW -> "N-S"
         TrafficPhase.EW_GREEN, TrafficPhase.EW_YELLOW -> "E-W"
+        TrafficPhase.ALL_RED -> ""
     }
 }
 
@@ -956,11 +977,12 @@ private fun getPhaseStatus(phase: TrafficPhase): String {
     return when (phase) {
         TrafficPhase.NS_GREEN, TrafficPhase.EW_GREEN -> "GREEN"
         TrafficPhase.NS_YELLOW, TrafficPhase.EW_YELLOW -> "YELLOW"
+        TrafficPhase.ALL_RED -> "RED"
     }
 }
 
 enum class TrafficPhase {
-    NS_GREEN, NS_YELLOW, EW_GREEN, EW_YELLOW
+    NS_GREEN, NS_YELLOW, EW_GREEN, EW_YELLOW, ALL_RED
 }
 
 @Composable

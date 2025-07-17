@@ -28,7 +28,7 @@ fun TopBarDashboard(hazeState: HazeState, selectedTab: Int, onSelect: (Int) -> U
 
     val currentTime = "2025-06-17 16:28:43 UTC"
     val dashboardTabs = listOf("Overview", "Live Status", "Quick Actions", "Insights")
-    val timeFrames = listOf("Real-time", "Last Hour", "Last 6H", "Today")
+//    val timeFrames = listOf("Real-time", "Last Hour", "Last 6H", "Today")
 
     Column(
         modifier = Modifier.hazeEffect(state = hazeState) {
@@ -87,25 +87,25 @@ fun TopBarDashboard(hazeState: HazeState, selectedTab: Int, onSelect: (Int) -> U
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 // Time Frame Selector
-                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    timeFrames.forEachIndexed { index, frame ->
-                        FilterChip(
-                            onClick = { selectedTimeFrame = index },
-                            label = {
-                                Text(
-                                    frame,
-                                    fontSize = 10.sp,
-                                    color = if (selectedTimeFrame == index) Color.White else Color.Gray
-                                )
-                            },
-                            selected = selectedTimeFrame == index,
-                            colors = FilterChipDefaults.filterChipColors(
-                                selectedContainerColor = MaterialTheme.colorScheme.primary,
-                                containerColor = MaterialTheme.colorScheme.primary.copy(0.1F) //Color(0xFF161B22)
-                            )
-                        )
-                    }
-                }
+//                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+//                    timeFrames.forEachIndexed { index, frame ->
+//                        FilterChip(
+//                            onClick = { selectedTimeFrame = index },
+//                            label = {
+//                                Text(
+//                                    frame,
+//                                    fontSize = 10.sp,
+//                                    color = if (selectedTimeFrame == index) Color.White else Color.Gray
+//                                )
+//                            },
+//                            selected = selectedTimeFrame == index,
+//                            colors = FilterChipDefaults.filterChipColors(
+//                                selectedContainerColor = MaterialTheme.colorScheme.primary,
+//                                containerColor = MaterialTheme.colorScheme.primary.copy(0.1F) //Color(0xFF161B22)
+//                            )
+//                        )
+//                    }
+//                }
 
                 UserProfileChip()
             }
@@ -118,25 +118,25 @@ fun TopBarDashboard(hazeState: HazeState, selectedTab: Int, onSelect: (Int) -> U
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            dashboardTabs.forEachIndexed { index, tab ->
-                FilterChip(
-                    onClick = { onSelect(index) },
-                    label = {
-                        Text(
-                            tab,
-                            fontSize = 12.sp,
-                            color = if (selectedTab == index)
-                                MaterialTheme.colorScheme.onPrimary
-                            else Color.Gray
-                        )
-                    },
-                    selected = selectedTab == index,
-                    colors = FilterChipDefaults.filterChipColors(
-                        selectedContainerColor = MaterialTheme.colorScheme.primary,
-                        containerColor = MaterialTheme.colorScheme.primary.copy(0.1F) //Color(0xFF161B22)
-                    )
-                )
-            }
+//            dashboardTabs.forEachIndexed { index, tab ->
+//                FilterChip(
+//                    onClick = { onSelect(index) },
+//                    label = {
+//                        Text(
+//                            tab,
+//                            fontSize = 12.sp,
+//                            color = if (selectedTab == index)
+//                                MaterialTheme.colorScheme.onPrimary
+//                            else Color.Gray
+//                        )
+//                    },
+//                    selected = selectedTab == index,
+//                    colors = FilterChipDefaults.filterChipColors(
+//                        selectedContainerColor = MaterialTheme.colorScheme.primary,
+//                        containerColor = MaterialTheme.colorScheme.primary.copy(0.1F) //Color(0xFF161B22)
+//                    )
+//                )
+//            }
         }
     }
 }

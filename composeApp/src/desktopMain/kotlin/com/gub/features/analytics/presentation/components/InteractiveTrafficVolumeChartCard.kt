@@ -113,7 +113,7 @@ fun InteractiveTrafficVolumeChartCard(
                     ) {
                         MetricItem(
                             label = "Current Volume",
-                            value = "${metrics.data.totalVehicles}",
+                            value = "${metrics.data.totalVehicles * 3}",
                             trend = "+5.2%",
                             color = Color(0xFF4CAF50)
                         )

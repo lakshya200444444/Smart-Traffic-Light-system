@@ -16,6 +16,7 @@ import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import com.gub.core.ui.theme.VehicleDetectionTheme
+import com.gub.features.analytics.viewModel.ViewModelAnalytics
 import java.awt.Toolkit
 
 
@@ -151,6 +152,7 @@ fun main() = application {
     ) {
         val dark = isSystemInDarkTheme()
         val isDarkTheme = remember { mutableStateOf(dark) }
+        val viewModelAnalytics: ViewModelAnalytics = remember { ViewModelAnalytics() }
         VehicleDetectionTheme(darkTheme = isDarkTheme.value) {
             TrafficManagementApp(isDarkTheme)
         }
