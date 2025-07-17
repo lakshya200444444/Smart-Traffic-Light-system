@@ -66,7 +66,7 @@ fun IntersectionOverviewCard(
             // Main Intersection Display
             when (selectedView) {
                 "Live" -> LiveIntersectionView(
-                    viewModelMonitoring.uiState,
+                    viewModelMonitoring,
                     vehicleCount = vehicleCount,
                     intersectionName = intersectionName
                 )
@@ -228,7 +228,7 @@ private fun ViewSelector(selectedView: String, onViewChange: (String) -> Unit) {
 
 @Composable
 private fun LiveIntersectionView(
-    viewModelMonitoring: StateFlow<MonitoringUiState>,
+    viewModelMonitoring: ViewModelMonitoring,
     vehicleCount: String,
     intersectionName: MutableState<String>
 ) {
@@ -251,13 +251,13 @@ private fun LiveIntersectionView(
         ModernRoadNetwork()
 
         // Smart Traffic Lights
-        SmartTrafficLights()
+        SmartTrafficLights(viewModelMonitoring)
 
         // Dynamic Vehicles
-        DynamicVehicleFlow(
-            viewModelMonitoring,
-            vehicleCount = vehicleCount
-        )
+//        DynamicVehicleFlow(
+//            viewModelMonitoring,
+//            vehicleCount = vehicleCount
+//        )
 
         // Traffic Info Overlay
 //        TrafficInfoOverlay()
@@ -403,36 +403,39 @@ private fun BoxScope.ModernRoadNetwork() {
 }
 
 @Composable
-private fun SmartTrafficLights() {
-    var currentPhase by remember { mutableStateOf(TrafficPhase.NS_GREEN) }
-    var timeRemaining by remember { mutableStateOf(45) }
+private fun SmartTrafficLights(viewModelMonitoring: ViewModelMonitoring) {
 
-    LaunchedEffect(Unit) {
-        while (true) {
-            delay(1000)
-            timeRemaining--
-            if (timeRemaining <= 0) {
-                currentPhase = when (currentPhase) {
-                    TrafficPhase.NS_GREEN -> {
-                        timeRemaining = 4
-                        TrafficPhase.NS_YELLOW
-                    }
-                    TrafficPhase.NS_YELLOW -> {
-                        timeRemaining = 35
-                        TrafficPhase.EW_GREEN
-                    }
-                    TrafficPhase.EW_GREEN -> {
-                        timeRemaining = 4
-                        TrafficPhase.EW_YELLOW
-                    }
-                    TrafficPhase.EW_YELLOW -> {
-                        timeRemaining = 45
-                        TrafficPhase.NS_GREEN
-                    }
-                }
-            }
-        }
-    }
+//    var currentPhase by remember { mutableStateOf(TrafficPhase.NS_GREEN) }
+//    var timeRemaining by remember { mutableStateOf(45) }
+//
+//    LaunchedEffect(Unit) {
+//        while (true) {
+//            delay(1000)
+//            timeRemaining--
+//            if (timeRemaining <= 0) {
+//                currentPhase = when (currentPhase) {
+//                    TrafficPhase.NS_GREEN -> {
+//                        timeRemaining = 4
+//                        TrafficPhase.NS_YELLOW
+//                    }
+//                    TrafficPhase.NS_YELLOW -> {
+//                        timeRemaining = 35
+//                        TrafficPhase.EW_GREEN
+//                    }
+//                    TrafficPhase.EW_GREEN -> {
+//                        timeRemaining = 4
+//                        TrafficPhase.EW_YELLOW
+//                    }
+//                    TrafficPhase.EW_YELLOW -> {
+//                        timeRemaining = 45
+//                        TrafficPhase.NS_GREEN
+//                    }
+//                }
+//            }
+//        }
+//    }
+
+    val uiState by viewModelMonitoring.uiState.collectAsState()
 
     Box(modifier = Modifier.fillMaxSize()) {
         SmartSignalBox(
@@ -440,12 +443,12 @@ private fun SmartTrafficLights() {
                 .align(Alignment.TopCenter)
                 .offset(x = 60.dp, y = 0.dp),
             direction = "N",
-            state = when (currentPhase) {
+            state = when (uiState.currentPhase) {
                 TrafficPhase.NS_GREEN -> TrafficLightState.GREEN
                 TrafficPhase.NS_YELLOW -> TrafficLightState.YELLOW
                 else -> TrafficLightState.RED
             },
-            timeRemaining = if (currentPhase == TrafficPhase.NS_GREEN || currentPhase == TrafficPhase.NS_YELLOW) timeRemaining else 0
+            timeRemaining = if (uiState.currentPhase == TrafficPhase.NS_GREEN || uiState.currentPhase == TrafficPhase.NS_YELLOW) uiState.timeRemaining else 0
         )
 
         // East Signal (for westbound traffic from Broadway)
@@ -454,12 +457,12 @@ private fun SmartTrafficLights() {
                 .align(Alignment.CenterEnd)
                 .offset(x = (-50).dp, y = 25.dp),
             direction = "E",
-            state = when (currentPhase) {
+            state = when (uiState.currentPhase) {
                 TrafficPhase.EW_GREEN -> TrafficLightState.GREEN
                 TrafficPhase.EW_YELLOW -> TrafficLightState.YELLOW
                 else -> TrafficLightState.RED
             },
-            timeRemaining = if (currentPhase == TrafficPhase.EW_GREEN || currentPhase == TrafficPhase.EW_YELLOW) timeRemaining else 0
+            timeRemaining = if (uiState.currentPhase == TrafficPhase.EW_GREEN || uiState.currentPhase == TrafficPhase.EW_YELLOW) uiState.timeRemaining else 0
         )
 
         // South Signal (for northbound traffic from 42nd St)
@@ -468,12 +471,12 @@ private fun SmartTrafficLights() {
                 .align(Alignment.BottomCenter)
                 .offset(x = (-60).dp, y = (-0).dp),
             direction = "S",
-            state = when (currentPhase) {
+            state = when (uiState.currentPhase) {
                 TrafficPhase.NS_GREEN -> TrafficLightState.GREEN
                 TrafficPhase.NS_YELLOW -> TrafficLightState.YELLOW
                 else -> TrafficLightState.RED
             },
-            timeRemaining = if (currentPhase == TrafficPhase.NS_GREEN || currentPhase == TrafficPhase.NS_YELLOW) timeRemaining else 0
+            timeRemaining = if (uiState.currentPhase == TrafficPhase.NS_GREEN || uiState.currentPhase == TrafficPhase.NS_YELLOW) uiState.timeRemaining else 0
         )
 
         // West Signal (for eastbound traffic from Broadway)
@@ -482,12 +485,12 @@ private fun SmartTrafficLights() {
                 .align(Alignment.CenterStart)
                 .offset(x = 50.dp, y = (-25).dp),
             direction = "W",
-            state = when (currentPhase) {
+            state = when (uiState.currentPhase) {
                 TrafficPhase.EW_GREEN -> TrafficLightState.GREEN
                 TrafficPhase.EW_YELLOW -> TrafficLightState.YELLOW
                 else -> TrafficLightState.RED
             },
-            timeRemaining = if (currentPhase == TrafficPhase.EW_GREEN || currentPhase == TrafficPhase.EW_YELLOW) timeRemaining else 0
+            timeRemaining = if (uiState.currentPhase == TrafficPhase.EW_GREEN || uiState.currentPhase == TrafficPhase.EW_YELLOW) uiState.timeRemaining else 0
         )
     }
 }
