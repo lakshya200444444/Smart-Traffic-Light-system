@@ -1,40 +1,48 @@
+from fastapi import FastAPI
+from pydantic import BaseModel
 import joblib
 import numpy as np
+import uvicorn
 
 # Load model and scaler
 model = joblib.load("traffic_predictor.pkl")
 scaler = joblib.load("traffic_scaler.pkl")
 
-# Example input (replace with your own)
-input_data = {
-    "hour": 17,
-    "dayofweek": 1,                 # Tuesday
-    "is_weekend": 0,                # Not weekend
-    "temperature": 31.5,            # Celsius
-    "humidity": 72.0,               # Percent
-    "rain": 0.1,                    # mm
-    "wind_speed": 8.0,              # km/h
-    "vehicle_count_last_5min": 50,
-    "weather_condition": 0          # Assume 0 = Clear
-}
+# Initialize FastAPI app
+app = FastAPI()
 
-# Order of features must match training
-features = [
-    input_data["hour"],
-    input_data["dayofweek"],
-    input_data["is_weekend"],
-    input_data["temperature"],
-    input_data["humidity"],
-    input_data["rain"],
-    input_data["wind_speed"],
-    input_data["vehicle_count_last_5min"],
-    input_data["weather_condition"]
-]
+# Define request body using Pydantic
+class TrafficInput(BaseModel):
+    hour: int
+    dayofweek: int
+    is_weekend: int
+    temperature: float
+    humidity: float
+    rain: float
+    wind_speed: float
+    vehicle_count_last_5min: int
+    weather_condition: int
 
-# Reshape and scale input
-X = np.array(features).reshape(1, -1)
-X_scaled = scaler.transform(X)
+@app.post("/predict")
+def predict_traffic(data: TrafficInput):
+    # Prepare features
+    features = [
+        data.hour,
+        data.dayofweek,
+        data.is_weekend,
+        data.temperature,
+        data.humidity,
+        data.rain,
+        data.wind_speed,
+        data.vehicle_count_last_5min,
+        data.weather_condition
+    ]
+    X = np.array(features).reshape(1, -1)
+    X_scaled = scaler.transform(X)
+    predicted_vehicle_count = model.predict(X_scaled)[0]
 
-# Predict
-predicted_vehicle_count = model.predict(X_scaled)[0]
-print(f"🚗 Predicted Vehicle Count: {predicted_vehicle_count:.2f}")
+    return {"predicted_vehicle_count": round(float(predicted_vehicle_count), 2)}
+
+
+if __name__ == "__main__":
+    uvicorn.run("predict_traffic:app", host="0.0.0.0", port=8090, reload=False)

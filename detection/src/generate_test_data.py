@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 # Simulate 2 days of data at 5-minute intervals
 rows = []
 start = datetime(2025, 7, 15, 6, 0)
-for i in range(2 * 24 * 12):  # 2 days, every 5 mins
+for i in range(10 * 24 * 12):  # 10 days, every 5 mins
     timestamp = start + timedelta(minutes=5 * i)
     hour = timestamp.hour
     dayofweek = timestamp.weekday()
@@ -17,7 +17,7 @@ for i in range(2 * 24 * 12):  # 2 days, every 5 mins
     weather_condition = random.choices(
         ["Clear", "Cloudy", "Rain"], weights=[0.5, 0.3, 0.2]
     )[0]
-    vc_last = random.randint(10, 60)
+    vc_last = random.randint(50, 150)
     vc = vc_last + random.randint(-5, 5)
 
     rows.append([
