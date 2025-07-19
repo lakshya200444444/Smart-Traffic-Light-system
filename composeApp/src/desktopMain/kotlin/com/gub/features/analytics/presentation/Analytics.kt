@@ -26,6 +26,8 @@ import com.gub.features.analytics.viewModel.ViewModelAnalytics
 import com.gub.utils.UiCalculations.toDp
 import dev.chrisbanes.haze.hazeSource
 import dev.chrisbanes.haze.rememberHazeState
+import java.awt.Desktop
+import java.net.URI
 
 @Composable
 fun Analytics() {
@@ -331,38 +333,46 @@ fun EnhancedExportDataCard(modifier: Modifier = Modifier, viewModel: ViewModelAn
                         icon = Icons.Default.FileDownload,
                         description = "Live traffic data",
                         isExporting = info.isExporting,
-                        onClick = { viewModel.exportData("csv") }
+                        onClick = {
+                            val url = "http://localhost:8080/api/settings/export-csv"
+                            try {
+                                Desktop.getDesktop().browse(URI(url))
+                            } catch (e: Exception) {
+                                e.printStackTrace()
+                            }
+//                            viewModel.exportData("csv")
+                        }
                     )
 
-                    Spacer(modifier = Modifier.height(8.dp))
+//                    Spacer(modifier = Modifier.height(8.dp))
 
-                    EnhancedExportButton(
-                        text = "Generate Analytics PDF",
-                        icon = Icons.Default.PictureAsPdf,
-                        description = "Comprehensive analysis report",
-                        isExporting = false,
-                        onClick = { viewModel.exportData("pdf") }
-                    )
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    EnhancedExportButton(
-                        text = "Share Live Dashboard",
-                        icon = Icons.Default.Share,
-                        description = "Real-time view link",
-                        isExporting = false,
-                        onClick = { viewModel.exportData("share") }
-                    )
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    EnhancedExportButton(
-                        text = "API Data Access",
-                        icon = Icons.Default.Api,
-                        description = "RESTful endpoints",
-                        isExporting = false,
-                        onClick = { viewModel.exportData("api") }
-                    )
+//                    EnhancedExportButton(
+//                        text = "Generate Analytics PDF",
+//                        icon = Icons.Default.PictureAsPdf,
+//                        description = "Comprehensive analysis report",
+//                        isExporting = false,
+//                        onClick = { viewModel.exportData("pdf") }
+//                    )
+//
+//                    Spacer(modifier = Modifier.height(8.dp))
+//
+//                    EnhancedExportButton(
+//                        text = "Share Live Dashboard",
+//                        icon = Icons.Default.Share,
+//                        description = "Real-time view link",
+//                        isExporting = false,
+//                        onClick = { viewModel.exportData("share") }
+//                    )
+//
+//                    Spacer(modifier = Modifier.height(8.dp))
+//
+//                    EnhancedExportButton(
+//                        text = "API Data Access",
+//                        icon = Icons.Default.Api,
+//                        description = "RESTful endpoints",
+//                        isExporting = false,
+//                        onClick = { viewModel.exportData("api") }
+//                    )
 
                     Spacer(modifier = Modifier.height(16.dp))
 

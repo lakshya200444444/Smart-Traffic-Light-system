@@ -1174,16 +1174,16 @@ private fun QuickMetrics(vehicleCount: String) {
         QuickMetric(
             modifier = Modifier.weight(1f),
             label = "WAIT TIME",
-            value = "3.2m",
-            trend = "-8%",
+            value = "~ m", //"3.2m",
+            trend = "~%", //"-8%",
             color = Color(0xFF10B981)
         )
 
         QuickMetric(
             modifier = Modifier.weight(1f),
             label = "EFFICIENCY",
-            value = "87%",
-            trend = "+5%",
+            value = "~%", //"87%",
+            trend = "~%", //"+5%",
             color = Color(0xFFFBBF24)
         )
     }

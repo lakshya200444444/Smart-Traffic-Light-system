@@ -72,7 +72,7 @@ fun AIStatusCard(modifier: Modifier = Modifier) {
                     modifier = Modifier.size(140.dp)
                 ) {
                     CircularProgressIndicator(
-                        progress = { 0.9F },
+                        progress = { 0.85F },
                         modifier = Modifier.size(140.dp),
                         strokeWidth = 8.dp,
                         trackColor = ProgressIndicatorDefaults.circularIndeterminateTrackColor,
@@ -83,7 +83,7 @@ fun AIStatusCard(modifier: Modifier = Modifier) {
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
-                            "97.1%",
+                            "85.1%",
                             color = MaterialTheme.colorScheme.onSurface,
                             fontSize = 16.sp,
                             lineHeight = 16.sp,
@@ -102,8 +102,8 @@ fun AIStatusCard(modifier: Modifier = Modifier) {
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            AIStatusItem("Models Running", "3/3", Color(0xFF4CAF50))
-            AIStatusItem("Average Decision Speed", "167ms", Color(0xFF4CAF50))
+            AIStatusItem("Models Running", "2/2", Color(0xFF4CAF50))
+            AIStatusItem("Average Decision Speed", "151ms", Color(0xFF4CAF50))
 //            AIStatusItem("Learning Rate", "97.8%", Color(0xFF2196F3))
 
             Spacer(modifier = Modifier.height(8.dp))
