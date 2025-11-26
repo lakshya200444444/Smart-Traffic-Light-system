@@ -18,6 +18,7 @@ import com.gub.core.ui.model.Navigation
 import com.gub.features.analytics.presentation.Analytics
 import com.gub.features.dashboard.presentation.Dashboard
 import com.gub.features.monitoring.presentation.Monitoring
+import com.gub.features.monitoring.viewModel.ViewModelMonitoring
 import com.gub.features.settings.presentation.Settings
 
 @Composable
@@ -29,6 +30,8 @@ fun TrafficManagementApp(isDarkTheme: MutableState<Boolean>) {
                 color = MaterialTheme.colorScheme.background
             )
     ) {
+        val viewModelMonitoring = remember { ViewModelMonitoring() }
+
         var aiEnabled  by remember { mutableStateOf(true) }
         var selectedTab by remember { mutableStateOf(Navigation.DASHBOARD) }
         val viewModelSystem by remember { mutableStateOf(ViewModelSystem()) }
@@ -87,7 +90,7 @@ fun TrafficManagementApp(isDarkTheme: MutableState<Boolean>) {
                 ) {
                     when(it) {
                         Navigation.DASHBOARD -> Dashboard()
-                        Navigation.MONITORING -> Monitoring()
+                        Navigation.MONITORING -> Monitoring(viewModelMonitoring)
                         Navigation.ANALYTICS -> Analytics()
                         Navigation.SETTINGS -> Settings()
                     }

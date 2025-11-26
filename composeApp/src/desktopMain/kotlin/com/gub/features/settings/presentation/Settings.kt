@@ -34,7 +34,7 @@ fun Settings() {
     var selectedSettingsTab by remember { mutableStateOf(0) }
     val currentTime = "2025-06-17 16:20:18 UTC"
 
-    val settingsTabs = listOf("General", "Notifications", "AI & Automation", "Data & Privacy", "System")
+//    val settingsTabs = listOf("General", "Notifications", "AI & Automation", "Data & Privacy", "System")
 
     val hazeState = rememberHazeState()
     var height by remember { mutableStateOf(0) }
@@ -46,30 +46,30 @@ fun Settings() {
         verticalArrangement = Arrangement.spacedBy(16.dp),
         contentPadding = PaddingValues(top = height.toDp() + 24.dp, start = 24.dp, end = 24.dp, bottom = 24.dp)
     ) {
-        item {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                settingsTabs.forEachIndexed { index, tab ->
-                    FilterChip(
-                        onClick = { selectedSettingsTab = index },
-                        label = {
-                            Text(
-                                tab,
-                                fontSize = 11.sp,
-                                color = if (selectedSettingsTab == index) Color.White else Color.Gray
-                            )
-                        },
-                        selected = selectedSettingsTab == index,
-                        colors = FilterChipDefaults.filterChipColors(
-                            selectedContainerColor = Color(0xFF2E7D32),
-                            containerColor = Color(0xFF161B22)
-                        )
-                    )
-                }
-            }
-        }
+//        item {
+//            Row(
+//                modifier = Modifier.fillMaxWidth(),
+//                horizontalArrangement = Arrangement.spacedBy(8.dp)
+//            ) {
+//                settingsTabs.forEachIndexed { index, tab ->
+//                    FilterChip(
+//                        onClick = { selectedSettingsTab = index },
+//                        label = {
+//                            Text(
+//                                tab,
+//                                fontSize = 11.sp,
+//                                color = if (selectedSettingsTab == index) Color.White else Color.Gray
+//                            )
+//                        },
+//                        selected = selectedSettingsTab == index,
+//                        colors = FilterChipDefaults.filterChipColors(
+//                            selectedContainerColor = Color(0xFF2E7D32),
+//                            containerColor = Color(0xFF161B22)
+//                        )
+//                    )
+//                }
+//            }
+//        }
 
         // Settings Content based on selected tab
         when (selectedSettingsTab) {
@@ -91,9 +91,9 @@ fun Settings() {
         }
 
         // Settings Footer
-        item {
-            SettingsFooter()
-        }
+//        item {
+//            SettingsFooter()
+//        }
     }
 
     TopBarSettings(

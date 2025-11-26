@@ -25,12 +25,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.gub.domain.models.monitoring.ModelLiveSignal
+import com.gub.domain.models.monitoring.ModelLiveSignal.Road.SignalType
+import com.gub.features.monitoring.domain.model.VehicleCountJson
 import com.gub.features.monitoring.presentation.TrafficLightState
 import com.gub.features.monitoring.viewModel.MonitoringUiState
 import com.gub.features.monitoring.viewModel.ViewModelMonitoring
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.StateFlow
-import org.jetbrains.compose.ui.tooling.preview.Preview
+import kotlinx.serialization.json.Json
 import kotlin.random.Random
 
 @Composable
@@ -64,7 +66,7 @@ fun IntersectionOverviewCard(
             // Main Intersection Display
             when (selectedView) {
                 "Live" -> LiveIntersectionView(
-                    viewModelMonitoring.uiState,
+                    viewModelMonitoring,
                     vehicleCount = vehicleCount,
                     intersectionName = intersectionName
                 )
@@ -75,7 +77,7 @@ fun IntersectionOverviewCard(
             Spacer(modifier = Modifier.height(20.dp))
 
             // Quick Metrics
-            QuickMetrics()
+            QuickMetrics(vehicleCount)
         }
     }
 }
@@ -226,7 +228,7 @@ private fun ViewSelector(selectedView: String, onViewChange: (String) -> Unit) {
 
 @Composable
 private fun LiveIntersectionView(
-    viewModelMonitoring: StateFlow<MonitoringUiState>,
+    viewModelMonitoring: ViewModelMonitoring,
     vehicleCount: String,
     intersectionName: MutableState<String>
 ) {
@@ -249,13 +251,13 @@ private fun LiveIntersectionView(
         ModernRoadNetwork()
 
         // Smart Traffic Lights
-        SmartTrafficLights()
+        SmartTrafficLights(viewModelMonitoring)
 
         // Dynamic Vehicles
-        DynamicVehicleFlow(
-            viewModelMonitoring,
-            vehicleCount = vehicleCount
-        )
+//        DynamicVehicleFlow(
+//            viewModelMonitoring,
+//            vehicleCount = vehicleCount
+//        )
 
         // Traffic Info Overlay
 //        TrafficInfoOverlay()
@@ -317,103 +319,123 @@ private fun BoxScope.ModernRoadNetwork() {
         )
 
         // Crosswalk stripes
-        for (i in 0..6) {
-            val stripeWidth = 4.dp.toPx()
-            val spacing = 8.dp.toPx()
 
-            // Horizontal crosswalks
+        val stripeWidth = 4.dp.toPx()
+        val spacing = 8.dp.toPx()
+        val totalStripeWidth = stripeWidth + spacing
+
+        for (i in 0..6) {
+            val offset = i * totalStripeWidth
+
+            // Horizontal crosswalk stripes (vertical lines)
             drawRect(
-                color = Color.White.copy(alpha = 0.6f),
-                topLeft = Offset(centerX - roadWidth / 2 + i * spacing, centerY - roadWidth / 2),
+                color = Color.White.copy(alpha = 0.5f),
+                topLeft = Offset(centerX - roadWidth / 2 + offset, centerY - roadWidth / 2),
                 size = Size(stripeWidth, roadWidth)
             )
 
-            // Vertical crosswalks
+            // Vertical crosswalk stripes (horizontal lines)
             drawRect(
-                color = Color.White.copy(alpha = 0.6f),
-                topLeft = Offset(centerX - roadWidth / 2, centerY - roadWidth / 2 + i * spacing),
+                color = Color.White.copy(alpha = 0.5f),
+                topLeft = Offset(centerX - roadWidth / 2, centerY - roadWidth / 2 + offset),
                 size = Size(roadWidth, stripeWidth)
             )
         }
+
+//        for (i in 0..6) {
+//            val stripeWidth = 4.dp.toPx()
+//            val spacing = 8.dp.toPx()
+//
+//            // Horizontal crosswalks
+//            drawRect(
+//                color = Color.White.copy(alpha = 0.5f),
+//                topLeft = Offset(centerX - roadWidth / 2 + i * spacing, centerY - roadWidth / 2),
+//                size = Size(stripeWidth, roadWidth)
+//            )
+//
+//            // Vertical crosswalks
+//            drawRect(
+//                color = Color.White.copy(alpha = 0.5f),
+//                topLeft = Offset(centerX - roadWidth / 2, centerY - roadWidth / 2 + i * spacing),
+//                size = Size(roadWidth, stripeWidth)
+//            )
+//        }
     }
 
     // Street name labels with modern styling
-    Card(
-        modifier = Modifier
-            .align(Alignment.CenterStart)
-            .padding(start = 20.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = Color.Black.copy(alpha = 0.8f)
-        ),
-        shape = RoundedCornerShape(8.dp)
-    ) {
-        Text(
-            "BROADWAY",
-            color = Color(0xFF00D4FF),
-            fontSize = 11.sp,
-            fontWeight = FontWeight.Bold,
-            letterSpacing = 1.sp,
-            modifier = Modifier.padding(8.dp, 4.dp)
-        )
-    }
+//    Card(
+//        modifier = Modifier
+//            .align(Alignment.CenterStart)
+//            .padding(start = 20.dp),
+//        colors = CardDefaults.cardColors(
+//            containerColor = Color.Black.copy(alpha = 0.8f)
+//        ),
+//        shape = RoundedCornerShape(8.dp)
+//    ) {
+//        Text(
+//            "BROADWAY",
+//            color = Color(0xFF00D4FF),
+//            fontSize = 11.sp,
+//            fontWeight = FontWeight.Bold,
+//            letterSpacing = 1.sp,
+//            modifier = Modifier.padding(8.dp, 4.dp)
+//        )
+//    }
 
-    Card(
-        modifier = Modifier
-            .align(Alignment.TopCenter)
-            .padding(top = 20.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = Color.Black.copy(alpha = 0.8f)
-        ),
-        shape = RoundedCornerShape(8.dp)
-    ) {
-        Text(
-            "42ND ST",
-            color = Color(0xFF00D4FF),
-            fontSize = 11.sp,
-            fontWeight = FontWeight.Bold,
-            letterSpacing = 1.sp,
-            modifier = Modifier.padding(8.dp, 4.dp)
-        )
-    }
+//    Card(
+//        modifier = Modifier
+//            .align(Alignment.TopCenter)
+//            .padding(top = 20.dp),
+//        colors = CardDefaults.cardColors(
+//            containerColor = Color.Black.copy(alpha = 0.8f)
+//        ),
+//        shape = RoundedCornerShape(8.dp)
+//    ) {
+//        Text(
+//            "42ND ST",
+//            color = Color(0xFF00D4FF),
+//            fontSize = 11.sp,
+//            fontWeight = FontWeight.Bold,
+//            letterSpacing = 1.sp,
+//            modifier = Modifier.padding(8.dp, 4.dp)
+//        )
+//    }
 }
 
 @Composable
-@Preview
-fun PreviewSmartTrafficLights() {
-    SmartTrafficLights()
-}
+private fun SmartTrafficLights(viewModelMonitoring: ViewModelMonitoring) {
 
-@Composable
-private fun SmartTrafficLights() {
-    var currentPhase by remember { mutableStateOf(TrafficPhase.NS_GREEN) }
-    var timeRemaining by remember { mutableStateOf(45) }
+//    var currentPhase by remember { mutableStateOf(TrafficPhase.NS_GREEN) }
+//    var timeRemaining by remember { mutableStateOf(45) }
+//
+//    LaunchedEffect(Unit) {
+//        while (true) {
+//            delay(1000)
+//            timeRemaining--
+//            if (timeRemaining <= 0) {
+//                currentPhase = when (currentPhase) {
+//                    TrafficPhase.NS_GREEN -> {
+//                        timeRemaining = 4
+//                        TrafficPhase.NS_YELLOW
+//                    }
+//                    TrafficPhase.NS_YELLOW -> {
+//                        timeRemaining = 35
+//                        TrafficPhase.EW_GREEN
+//                    }
+//                    TrafficPhase.EW_GREEN -> {
+//                        timeRemaining = 4
+//                        TrafficPhase.EW_YELLOW
+//                    }
+//                    TrafficPhase.EW_YELLOW -> {
+//                        timeRemaining = 45
+//                        TrafficPhase.NS_GREEN
+//                    }
+//                }
+//            }
+//        }
+//    }
 
-    LaunchedEffect(Unit) {
-        while (true) {
-            delay(1000)
-            timeRemaining--
-            if (timeRemaining <= 0) {
-                currentPhase = when (currentPhase) {
-                    TrafficPhase.NS_GREEN -> {
-                        timeRemaining = 4
-                        TrafficPhase.NS_YELLOW
-                    }
-                    TrafficPhase.NS_YELLOW -> {
-                        timeRemaining = 35
-                        TrafficPhase.EW_GREEN
-                    }
-                    TrafficPhase.EW_GREEN -> {
-                        timeRemaining = 4
-                        TrafficPhase.EW_YELLOW
-                    }
-                    TrafficPhase.EW_YELLOW -> {
-                        timeRemaining = 45
-                        TrafficPhase.NS_GREEN
-                    }
-                }
-            }
-        }
-    }
+    val uiState by viewModelMonitoring.uiState.collectAsState()
 
     Box(modifier = Modifier.fillMaxSize()) {
         SmartSignalBox(
@@ -421,12 +443,12 @@ private fun SmartTrafficLights() {
                 .align(Alignment.TopCenter)
                 .offset(x = 60.dp, y = 0.dp),
             direction = "N",
-            state = when (currentPhase) {
+            state = when (uiState.currentPhase) {
                 TrafficPhase.NS_GREEN -> TrafficLightState.GREEN
                 TrafficPhase.NS_YELLOW -> TrafficLightState.YELLOW
                 else -> TrafficLightState.RED
             },
-            timeRemaining = if (currentPhase == TrafficPhase.NS_GREEN || currentPhase == TrafficPhase.NS_YELLOW) timeRemaining else 0
+            timeRemaining = if (uiState.currentPhase == TrafficPhase.NS_GREEN || uiState.currentPhase == TrafficPhase.NS_YELLOW) uiState.timeRemaining else 0
         )
 
         // East Signal (for westbound traffic from Broadway)
@@ -435,12 +457,12 @@ private fun SmartTrafficLights() {
                 .align(Alignment.CenterEnd)
                 .offset(x = (-50).dp, y = 25.dp),
             direction = "E",
-            state = when (currentPhase) {
+            state = when (uiState.currentPhase) {
                 TrafficPhase.EW_GREEN -> TrafficLightState.GREEN
                 TrafficPhase.EW_YELLOW -> TrafficLightState.YELLOW
                 else -> TrafficLightState.RED
             },
-            timeRemaining = if (currentPhase == TrafficPhase.EW_GREEN || currentPhase == TrafficPhase.EW_YELLOW) timeRemaining else 0
+            timeRemaining = if (uiState.currentPhase == TrafficPhase.EW_GREEN || uiState.currentPhase == TrafficPhase.EW_YELLOW) uiState.timeRemaining else 0
         )
 
         // South Signal (for northbound traffic from 42nd St)
@@ -449,12 +471,12 @@ private fun SmartTrafficLights() {
                 .align(Alignment.BottomCenter)
                 .offset(x = (-60).dp, y = (-0).dp),
             direction = "S",
-            state = when (currentPhase) {
+            state = when (uiState.currentPhase) {
                 TrafficPhase.NS_GREEN -> TrafficLightState.GREEN
                 TrafficPhase.NS_YELLOW -> TrafficLightState.YELLOW
                 else -> TrafficLightState.RED
             },
-            timeRemaining = if (currentPhase == TrafficPhase.NS_GREEN || currentPhase == TrafficPhase.NS_YELLOW) timeRemaining else 0
+            timeRemaining = if (uiState.currentPhase == TrafficPhase.NS_GREEN || uiState.currentPhase == TrafficPhase.NS_YELLOW) uiState.timeRemaining else 0
         )
 
         // West Signal (for eastbound traffic from Broadway)
@@ -463,12 +485,12 @@ private fun SmartTrafficLights() {
                 .align(Alignment.CenterStart)
                 .offset(x = 50.dp, y = (-25).dp),
             direction = "W",
-            state = when (currentPhase) {
+            state = when (uiState.currentPhase) {
                 TrafficPhase.EW_GREEN -> TrafficLightState.GREEN
                 TrafficPhase.EW_YELLOW -> TrafficLightState.YELLOW
                 else -> TrafficLightState.RED
             },
-            timeRemaining = if (currentPhase == TrafficPhase.EW_GREEN || currentPhase == TrafficPhase.EW_YELLOW) timeRemaining else 0
+            timeRemaining = if (uiState.currentPhase == TrafficPhase.EW_GREEN || uiState.currentPhase == TrafficPhase.EW_YELLOW) uiState.timeRemaining else 0
         )
     }
 }
@@ -564,19 +586,41 @@ fun DynamicVehicleFlow(viewModelMonitoring: StateFlow<MonitoringUiState>, vehicl
     val uiState by viewModelMonitoring.collectAsState()
 
     var vehicles by remember { mutableStateOf<List<Vehicle>>(emptyList()) }
+    var currentPhase by remember { mutableStateOf(TrafficPhase.NS_GREEN) }
 
+    println(vehicleCount.toString())
+
+    // Update traffic phase based on signal state
     LaunchedEffect(uiState.liveSignal) {
         uiState.liveSignal?.let { signal ->
-            vehicles = generateVehiclesFromSignal(signal)
+            currentPhase = determineTrafficPhase(signal)
         }
     }
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(uiState.liveSignal, vehicleCount, currentPhase) {
+        uiState.liveSignal?.let { signal ->
+            vehicles = generateVehiclesFromSignal(signal, vehicleCount, currentPhase)
+        }
+    }
+
+    // Animate vehicles on green lanes only
+    LaunchedEffect(currentPhase) {
         while (true) {
             vehicles = vehicles.map { vehicle ->
-                updateVehiclePosition(vehicle)
-            }.filter { it.position < 1.2f }
-
+                if (shouldVehicleMove(vehicle, currentPhase)) {
+                    updateVehiclePosition(vehicle)
+                } else {
+                    // Keep vehicles stationary on red signal
+                    vehicle
+                }
+            }.filter {
+                // Remove vehicles that have moved off screen on green lanes
+                if (shouldVehicleMove(it, currentPhase)) {
+                    it.position < 1.2f
+                } else {
+                    true // Keep all vehicles on red lanes
+                }
+            }
             delay(100)
         }
     }
@@ -586,51 +630,173 @@ fun DynamicVehicleFlow(viewModelMonitoring: StateFlow<MonitoringUiState>, vehicl
             val (x, y) = getVehicleScreenPosition(vehicle)
             ModernVehicle(
                 modifier = Modifier.offset(x.dp, y.dp),
-                vehicle = vehicle
+                vehicle = vehicle,
+                isMoving = shouldVehicleMove(vehicle, currentPhase)
+            )
+        }
+
+        // Traffic phase indicator
+        TrafficPhaseIndicator(
+            modifier = Modifier.align(Alignment.Center),
+            currentPhase = currentPhase
+        )
+    }
+}
+
+fun determineTrafficPhase(signal: ModelLiveSignal): TrafficPhase {
+    return when {
+        (signal.north.type == SignalType.GREEN || signal.south.type == SignalType.GREEN) &&
+                (signal.east.type == SignalType.RED || signal.west.type == SignalType.RED) -> TrafficPhase.NS_GREEN
+
+        (signal.north.type == SignalType.YELLOW || signal.south.type == SignalType.YELLOW) &&
+                (signal.east.type == SignalType.RED || signal.west.type == SignalType.RED) -> TrafficPhase.NS_YELLOW
+
+        (signal.east.type == SignalType.GREEN || signal.west.type == SignalType.GREEN) &&
+                (signal.north.type == SignalType.RED || signal.south.type == SignalType.RED) -> TrafficPhase.EW_GREEN
+
+        (signal.east.type == SignalType.YELLOW || signal.west.type == SignalType.YELLOW) &&
+                (signal.north.type == SignalType.RED || signal.south.type == SignalType.RED) -> TrafficPhase.EW_YELLOW
+
+        else -> TrafficPhase.NS_GREEN // Default
+    }
+}
+
+fun shouldVehicleMove(vehicle: Vehicle, currentPhase: TrafficPhase): Boolean {
+    return when (currentPhase) {
+        TrafficPhase.NS_GREEN, TrafficPhase.NS_YELLOW -> {
+            // North-South lanes can move
+            vehicle.lane in listOf(
+                VehicleLane.NORTH_1, VehicleLane.NORTH_2, VehicleLane.NORTH_3,
+                VehicleLane.SOUTH_1, VehicleLane.SOUTH_2, VehicleLane.SOUTH_3
+            )
+        }
+        TrafficPhase.EW_GREEN, TrafficPhase.EW_YELLOW -> {
+            // East-West lanes can move
+            vehicle.lane in listOf(
+                VehicleLane.EAST_1, VehicleLane.EAST_2, VehicleLane.EAST_3,
+                VehicleLane.WEST_1, VehicleLane.WEST_2, VehicleLane.WEST_3
+            )
+        }
+
+        TrafficPhase.ALL_RED -> {
+            vehicle.lane in listOf(
+                VehicleLane.EAST_1, VehicleLane.EAST_2, VehicleLane.EAST_3,
+                VehicleLane.WEST_1, VehicleLane.WEST_2, VehicleLane.WEST_3
             )
         }
     }
 }
 
-fun generateVehiclesFromSignal(signal: ModelLiveSignal): List<Vehicle> {
-    val roadToLanes = mapOf(
-        VehicleLane.BROADWAY_EAST_1 to signal.east,
-        VehicleLane.BROADWAY_EAST_2 to signal.east,
-        VehicleLane.BROADWAY_EAST_3 to signal.east,
+fun generateVehiclesFromSignal(signal: ModelLiveSignal, vehicleCountJson: String, currentPhase: TrafficPhase): List<Vehicle> {
+    val parsed = Json.decodeFromString<VehicleCountJson>(vehicleCountJson)
+    val vehicleTypeMap = mutableMapOf<VehicleType, Int>().apply {
+        VehicleType.entries.forEach { type ->
+            val count = when (type.name.lowercase()) {
+                "car" -> parsed.car
+                "motorcycle" -> parsed.motorcycle
+                "bus" -> parsed.bus
+                "truck" -> parsed.truck
+                "person" -> parsed.person
+                else -> 0
+            }
+            this[type] = count
+        }
+    }
 
-        VehicleLane.BROADWAY_WEST_1 to signal.west,
-        VehicleLane.BROADWAY_WEST_2 to signal.west,
-        VehicleLane.BROADWAY_WEST_3 to signal.west,
+    // Separate lanes based on current traffic phase
+    val (greenLanes, redLanes) = when (currentPhase) {
+        TrafficPhase.NS_GREEN, TrafficPhase.NS_YELLOW -> {
+            val green = listOf(
+                VehicleLane.NORTH_1, VehicleLane.NORTH_2, VehicleLane.NORTH_3,
+                VehicleLane.SOUTH_1, VehicleLane.SOUTH_2, VehicleLane.SOUTH_3
+            )
+            val red = listOf(
+                VehicleLane.EAST_1, VehicleLane.EAST_2, VehicleLane.EAST_3,
+                VehicleLane.WEST_1, VehicleLane.WEST_2, VehicleLane.WEST_3
+            )
+            Pair(green, red)
+        }
+        TrafficPhase.EW_GREEN, TrafficPhase.EW_YELLOW -> {
+            val green = listOf(
+                VehicleLane.EAST_1, VehicleLane.EAST_2, VehicleLane.EAST_3,
+                VehicleLane.WEST_1, VehicleLane.WEST_2, VehicleLane.WEST_3
+            )
+            val red = listOf(
+                VehicleLane.NORTH_1, VehicleLane.NORTH_2, VehicleLane.NORTH_3,
+                VehicleLane.SOUTH_1, VehicleLane.SOUTH_2, VehicleLane.SOUTH_3
+            )
+            Pair(green, red)
+        }
 
-        VehicleLane.STREET_42_SOUTH_1 to signal.south,
-        VehicleLane.STREET_42_SOUTH_2 to signal.south,
-        VehicleLane.STREET_42_SOUTH_3 to signal.south,
-
-        VehicleLane.STREET_42_NORTH_1 to signal.north,
-        VehicleLane.STREET_42_NORTH_2 to signal.north,
-        VehicleLane.STREET_42_NORTH_3 to signal.north,
-    )
+        TrafficPhase.ALL_RED -> {
+            val green = listOf(
+                VehicleLane.EAST_1, VehicleLane.EAST_2, VehicleLane.EAST_3,
+                VehicleLane.WEST_1, VehicleLane.WEST_2, VehicleLane.WEST_3
+            )
+            val red = listOf(
+                VehicleLane.NORTH_1, VehicleLane.NORTH_2, VehicleLane.NORTH_3,
+                VehicleLane.SOUTH_1, VehicleLane.SOUTH_2, VehicleLane.SOUTH_3
+            )
+            Pair(green, red)
+        }
+    }
 
     var idCounter = 0
+    val vehicles = mutableListOf<Vehicle>()
 
-    return roadToLanes.flatMap { (lane, road) ->
-        val count = when (road.type) {
-            ModelLiveSignal.Road.SignalType.GREEN -> road.vehicleCount / 3
-            else -> road.vehicleCount
-        }.coerceAtMost(5) // limit per lane
+    // Calculate vehicles per lane type
+    val totalVehicleCount = vehicleTypeMap.values.sum()
+    val vehiclesPerDirection = totalVehicleCount / 2 // Split between two directions
 
-        List(count) {
-            val type = VehicleType.values().random()
-            Vehicle(
-                id = idCounter++,
-                lane = lane,
-                type = type,
-                position = 0f,
-                speed = Random.nextFloat() * 0.01f + 0.005f,
-                color = type.color
+    // Distribute vehicles to red lanes (waiting vehicles)
+    var redLaneIndex = 0
+    for ((type, count) in vehicleTypeMap) {
+        val vehiclesForRedLanes = (count * 0.6).toInt() // 60% waiting on red
+        repeat(vehiclesForRedLanes) {
+            val lane = redLanes[redLaneIndex % redLanes.size]
+            redLaneIndex++
+
+            // Position vehicles in a queue (closer to intersection)
+            val queuePosition = (redLaneIndex % 8) * 0.08f + 0.6f
+
+            vehicles.add(
+                Vehicle(
+                    id = idCounter++,
+                    lane = lane,
+                    type = type,
+                    position = queuePosition,
+                    speed = Random.nextFloat() * 0.01f + 0.005f,
+                    color = type.color
+                )
             )
         }
     }
+
+    // Distribute vehicles to green lanes (moving vehicles)
+    var greenLaneIndex = 0
+    for ((type, count) in vehicleTypeMap) {
+        val vehiclesForGreenLanes = (count * 0.4).toInt() // 40% moving on green
+        repeat(vehiclesForGreenLanes) {
+            val lane = greenLanes[greenLaneIndex % greenLanes.size]
+            greenLaneIndex++
+
+            // Spread vehicles across the green lanes
+            val movingPosition = Random.nextFloat() * 0.8f
+
+            vehicles.add(
+                Vehicle(
+                    id = idCounter++,
+                    lane = lane,
+                    type = type,
+                    position = movingPosition,
+                    speed = Random.nextFloat() * 0.01f + 0.005f,
+                    color = type.color
+                )
+            )
+        }
+    }
+
+    return vehicles
 }
 
 data class Vehicle(
@@ -642,12 +808,11 @@ data class Vehicle(
     val color: Color
 )
 
-
 enum class VehicleLane {
-    BROADWAY_EAST_1, BROADWAY_EAST_2, BROADWAY_EAST_3,  // Left to right movement
-    BROADWAY_WEST_1, BROADWAY_WEST_2, BROADWAY_WEST_3,  // Right to left movement
-    STREET_42_SOUTH_1, STREET_42_SOUTH_2, STREET_42_SOUTH_3,  // Top to bottom movement
-    STREET_42_NORTH_1, STREET_42_NORTH_2, STREET_42_NORTH_3   // Bottom to top movement
+    EAST_1, EAST_2, EAST_3,  // Left to right movement
+    WEST_1, WEST_2, WEST_3,  // Right to left movement
+    SOUTH_1, SOUTH_2, SOUTH_3,  // Top to bottom movement
+    NORTH_1, NORTH_2, NORTH_3   // Bottom to top movement
 }
 
 enum class VehicleType(val color: Color, val icon: ImageVector) {
@@ -656,25 +821,6 @@ enum class VehicleType(val color: Color, val icon: ImageVector) {
     BUS(Color(0xFF059669), Icons.Default.DirectionsBus),
     TRUCK(Color(0xFFDC2626), Icons.Default.LocalShipping),
     BIKE(Color(0xFF8B5CF6), Icons.Default.DirectionsBike)
-}
-
-private fun generateRandomVehicles(): List<Vehicle> {
-    return (1..10).map { generateRandomVehicle() }
-}
-
-private fun generateRandomVehicle(): Vehicle {
-    val lanes = VehicleLane.values()
-    val types = VehicleType.values()
-    val selectedType = types.random()
-
-    return Vehicle(
-        id = Random.nextInt(),
-        lane = lanes.random(),
-        type = selectedType,
-        position = Random.nextFloat() * 0.2f,
-        speed = Random.nextFloat() * 0.015f + 0.008f,
-        color = selectedType.color
-    )
 }
 
 private fun updateVehiclePosition(vehicle: Vehicle): Vehicle {
@@ -688,43 +834,51 @@ private fun getVehicleScreenPosition(vehicle: Vehicle): Pair<Float, Float> {
 
     return when (vehicle.lane) {
         // Broadway Eastbound (Left to Right)
-        VehicleLane.BROADWAY_EAST_1 -> Pair(-30f + progress * 400f, roadCenter - laneOffset)
-        VehicleLane.BROADWAY_EAST_2 -> Pair(-30f + progress * 400f, roadCenter)
-        VehicleLane.BROADWAY_EAST_3 -> Pair(-30f + progress * 400f, roadCenter + laneOffset)
+        VehicleLane.EAST_1 -> Pair(-30f + progress * 400f, roadCenter - laneOffset)
+        VehicleLane.EAST_2 -> Pair(-30f + progress * 400f, roadCenter)
+        VehicleLane.EAST_3 -> Pair(-30f + progress * 400f, roadCenter + laneOffset)
 
         // Broadway Westbound (Right to Left)
-        VehicleLane.BROADWAY_WEST_1 -> Pair(370f - progress * 400f, roadCenter + laneOffset + 15f)
-        VehicleLane.BROADWAY_WEST_2 -> Pair(370f - progress * 400f, roadCenter + 15f)
-        VehicleLane.BROADWAY_WEST_3 -> Pair(370f - progress * 400f, roadCenter - laneOffset + 15f)
+        VehicleLane.WEST_1 -> Pair(370f - progress * 400f, roadCenter + laneOffset + 15f)
+        VehicleLane.WEST_2 -> Pair(370f - progress * 400f, roadCenter + 15f)
+        VehicleLane.WEST_3 -> Pair(370f - progress * 400f, roadCenter - laneOffset + 15f)
 
         // 42nd Street Southbound (Top to Bottom)
-        VehicleLane.STREET_42_SOUTH_1 -> Pair(roadCenter - laneOffset, -30f + progress * 340f)
-        VehicleLane.STREET_42_SOUTH_2 -> Pair(roadCenter, -30f + progress * 340f)
-        VehicleLane.STREET_42_SOUTH_3 -> Pair(roadCenter + laneOffset, -30f + progress * 340f)
+        VehicleLane.SOUTH_1 -> Pair(roadCenter - laneOffset, -30f + progress * 340f)
+        VehicleLane.SOUTH_2 -> Pair(roadCenter, -30f + progress * 340f)
+        VehicleLane.SOUTH_3 -> Pair(roadCenter + laneOffset, -30f + progress * 340f)
 
         // 42nd Street Northbound (Bottom to Top)
-        VehicleLane.STREET_42_NORTH_1 -> Pair(roadCenter + laneOffset + 15f, 310f - progress * 340f)
-        VehicleLane.STREET_42_NORTH_2 -> Pair(roadCenter + 15f, 310f - progress * 340f)
-        VehicleLane.STREET_42_NORTH_3 -> Pair(roadCenter - laneOffset + 15f, 310f - progress * 340f)
+        VehicleLane.NORTH_1 -> Pair(roadCenter + laneOffset + 15f, 310f - progress * 340f)
+        VehicleLane.NORTH_2 -> Pair(roadCenter + 15f, 310f - progress * 340f)
+        VehicleLane.NORTH_3 -> Pair(roadCenter - laneOffset + 15f, 310f - progress * 340f)
     }
 }
 
 @Composable
 private fun ModernVehicle(
     modifier: Modifier = Modifier,
-    vehicle: Vehicle
+    vehicle: Vehicle,
+    isMoving: Boolean = true
 ) {
     Box(modifier = modifier) {
-        // Vehicle shadow/glow
+        // Vehicle shadow/glow - different for moving vs stopped
         Box(
             modifier = Modifier
                 .size(14.dp)
                 .background(
                     Brush.radialGradient(
-                        colors = listOf(
-                            vehicle.color.copy(alpha = 0.5f),
-                            Color.Transparent
-                        ),
+                        colors = if (isMoving) {
+                            listOf(
+                                vehicle.color.copy(alpha = 0.5f),
+                                Color.Transparent
+                            )
+                        } else {
+                            listOf(
+                                Color.Red.copy(alpha = 0.3f),
+                                Color.Transparent
+                            )
+                        },
                         radius = 25f
                     ),
                     RoundedCornerShape(3.dp)
@@ -737,7 +891,7 @@ private fun ModernVehicle(
                 .align(Alignment.Center)
                 .size(10.dp, 6.dp)
                 .background(
-                    vehicle.color,
+                    if (isMoving) vehicle.color else vehicle.color.copy(alpha = 0.7f),
                     RoundedCornerShape(2.dp)
                 ),
             contentAlignment = Alignment.Center
@@ -750,33 +904,29 @@ private fun ModernVehicle(
             )
         }
 
-        // Direction indicator based on lane
-        val directionColor = when (vehicle.lane) {
-            VehicleLane.BROADWAY_EAST_1, VehicleLane.BROADWAY_EAST_2, VehicleLane.BROADWAY_EAST_3 -> Color(0xFF00FF88)
-            VehicleLane.BROADWAY_WEST_1, VehicleLane.BROADWAY_WEST_2, VehicleLane.BROADWAY_WEST_3 -> Color(0xFFFF6B6B)
-            VehicleLane.STREET_42_SOUTH_1, VehicleLane.STREET_42_SOUTH_2, VehicleLane.STREET_42_SOUTH_3 -> Color(0xFF4ECDC4)
-            VehicleLane.STREET_42_NORTH_1, VehicleLane.STREET_42_NORTH_2, VehicleLane.STREET_42_NORTH_3 -> Color(0xFFFFE66D)
-        }
-
+        // Status indicator - green for moving, red for stopped
         Box(
             modifier = Modifier
                 .align(Alignment.TopEnd)
                 .size(3.dp)
-                .background(directionColor, CircleShape)
+                .background(
+                    if (isMoving) Color(0xFF00FF88) else Color(0xFFFF4444),
+                    CircleShape
+                )
         )
     }
 }
 
 @Composable
-private fun BoxScope.TrafficInfoOverlay() {
-    // Current phase indicator in center
+private fun TrafficPhaseIndicator(
+    modifier: Modifier = Modifier,
+    currentPhase: TrafficPhase
+) {
     Card(
-        modifier = Modifier
-            .align(Alignment.Center)
-            .size(60.dp),
+        modifier = modifier.size(60.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         shape = RoundedCornerShape(12.dp),
-        border = BorderStroke(1.dp, Color(0xFF3B82F6).copy(alpha = 0.4f))
+        border = BorderStroke(1.dp, getCurrentPhaseColor(currentPhase).copy(alpha = 0.4f))
     ) {
         Column(
             modifier = Modifier.fillMaxSize(),
@@ -786,23 +936,53 @@ private fun BoxScope.TrafficInfoOverlay() {
             Icon(
                 Icons.Default.Traffic,
                 contentDescription = null,
-                tint = Color(0xFF10B981),
+                tint = getCurrentPhaseColor(currentPhase),
                 modifier = Modifier.size(16.dp)
             )
             Spacer(modifier = Modifier.height(2.dp))
             Text(
-                "N-S",
-                color = Color(0xFF10B981),
+                getCurrentPhaseText(currentPhase),
+                color = getCurrentPhaseColor(currentPhase),
                 fontSize = 10.sp,
                 fontWeight = FontWeight.Bold
             )
             Text(
-                "ACTIVE",
+                getPhaseStatus(currentPhase),
                 color = Color.White,
                 fontSize = 8.sp
             )
         }
     }
+}
+
+private fun getCurrentPhaseColor(phase: TrafficPhase): Color {
+    return when (phase) {
+        TrafficPhase.NS_GREEN -> Color(0xFF10B981)
+        TrafficPhase.NS_YELLOW -> Color(0xFFFBBF24)
+        TrafficPhase.EW_GREEN -> Color(0xFF10B981)
+        TrafficPhase.EW_YELLOW -> Color(0xFFFBBF24)
+        TrafficPhase.ALL_RED -> Color(0xFFE20000)
+    }
+}
+
+private fun getCurrentPhaseText(phase: TrafficPhase): String {
+    return when (phase) {
+        TrafficPhase.NS_GREEN, TrafficPhase.NS_YELLOW -> "N-S"
+        TrafficPhase.EW_GREEN, TrafficPhase.EW_YELLOW -> "E-W"
+        TrafficPhase.ALL_RED -> ""
+    }
+}
+
+private fun getPhaseStatus(phase: TrafficPhase): String {
+    return when (phase) {
+        TrafficPhase.NS_GREEN, TrafficPhase.EW_GREEN -> "GREEN"
+        TrafficPhase.NS_YELLOW, TrafficPhase.EW_YELLOW -> "YELLOW"
+        TrafficPhase.ALL_RED -> "RED"
+    }
+}
+
+enum class TrafficPhase {
+    NS_GREEN, NS_YELLOW, EW_GREEN, EW_YELLOW, ALL_RED
 }
 
 @Composable
@@ -976,7 +1156,9 @@ private fun HistoryItem(
 }
 
 @Composable
-private fun QuickMetrics() {
+private fun QuickMetrics(vehicleCount: String) {
+    val vehicle = Json.decodeFromString<VehicleCountJson>(vehicleCount)
+    val count = vehicle.car + vehicle.motorcycle + vehicle.bus + vehicle.truck // + vehicle.person
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -984,7 +1166,7 @@ private fun QuickMetrics() {
         QuickMetric(
             modifier = Modifier.weight(1f),
             label = "VEHICLES",
-            value = "1,247",
+            value = count.toString(),
             trend = "+12%",
             color = Color(0xFF00D4FF)
         )
@@ -992,16 +1174,16 @@ private fun QuickMetrics() {
         QuickMetric(
             modifier = Modifier.weight(1f),
             label = "WAIT TIME",
-            value = "3.2m",
-            trend = "-8%",
+            value = "~ m", //"3.2m",
+            trend = "~%", //"-8%",
             color = Color(0xFF10B981)
         )
 
         QuickMetric(
             modifier = Modifier.weight(1f),
             label = "EFFICIENCY",
-            value = "87%",
-            trend = "+5%",
+            value = "~%", //"87%",
+            trend = "~%", //"+5%",
             color = Color(0xFFFBBF24)
         )
     }
@@ -1053,9 +1235,525 @@ private fun QuickMetric(
     }
 }
 
-enum class TrafficPhase {
-    NS_GREEN, NS_YELLOW, EW_GREEN, EW_YELLOW
-}
+//@Composable
+//fun DynamicVehicleFlow(viewModelMonitoring: StateFlow<MonitoringUiState>, vehicleCount: String) {
+//    val uiState by viewModelMonitoring.collectAsState()
+//
+//    var vehicles by remember { mutableStateOf<List<Vehicle>>(emptyList()) }
+//
+//    println(vehicleCount.toString())
+//
+//    LaunchedEffect(uiState.liveSignal, vehicleCount) {
+//        uiState.liveSignal?.let { signal ->
+//            vehicles = generateVehiclesFromSignal(signal, vehicleCount)
+//        }
+//    }
+//
+////    LaunchedEffect(Unit) {
+////        while (true) {
+////            vehicles = vehicles.map { vehicle ->
+////                updateVehiclePosition(vehicle)
+////            }.filter { it.position < 1.2f }
+////
+////            delay(100)
+////        }
+////    }
+//
+//    Box(modifier = Modifier.fillMaxSize()) {
+//        vehicles.forEach { vehicle ->
+//            val (x, y) = getVehicleScreenPosition(vehicle)
+//            ModernVehicle(
+//                modifier = Modifier.offset(x.dp, y.dp),
+//                vehicle = vehicle
+//            )
+//        }
+//    }
+//}
+//
+//fun generateVehiclesFromSignal(signal: ModelLiveSignal, vehicleCountJson: String): List<Vehicle> {
+//    val parsed = Json.decodeFromString<VehicleCountJson>(vehicleCountJson)
+//    val vehicleTypeMap = mutableMapOf<VehicleType, Int>().apply {
+//        VehicleType.entries.forEach { type ->
+//            val count = when (type.name.lowercase()) {
+//                "car" -> parsed.car
+//                "motorcycle" -> parsed.motorcycle
+//                "bus" -> parsed.bus
+//                "truck" -> parsed.truck
+//                "person" -> parsed.person
+//                else -> 0
+//            }
+//            this[type] = count
+//        }
+//    }
+//
+//    val roadToLanes = mapOf(
+//        VehicleLane.EAST_1 to signal.east,
+//        VehicleLane.EAST_2 to signal.east,
+//        VehicleLane.EAST_3 to signal.east,
+//
+//        VehicleLane.WEST_1 to signal.west,
+//        VehicleLane.WEST_2 to signal.west,
+//        VehicleLane.WEST_3 to signal.west,
+//
+//        VehicleLane.SOUTH_1 to signal.south,
+//        VehicleLane.SOUTH_2 to signal.south,
+//        VehicleLane.SOUTH_3 to signal.south,
+//
+//        VehicleLane.NORTH_1 to signal.north,
+//        VehicleLane.NORTH_2 to signal.north,
+//        VehicleLane.NORTH_3 to signal.north,
+//    )
+//
+//    val allLanes = roadToLanes.keys.toList()
+//    val totalVehicleCount = vehicleTypeMap.values.sum()
+//    var idCounter = 0
+//    var laneIndex = 0
+//
+//    val vehicles = mutableListOf<Vehicle>()
+//
+//    for ((type, count) in vehicleTypeMap) {
+//        repeat(count) {
+//            val lane = allLanes[laneIndex % allLanes.size]
+//            laneIndex++
+//            vehicles.add(
+//                Vehicle(
+//                    id = idCounter++,
+//                    lane = lane,
+//                    type = type,
+//                    position = 0f,
+//                    speed = Random.nextFloat() * 0.01f + 0.005f,
+//                    color = type.color
+//                )
+//            )
+//        }
+//    }
+//
+//    return vehicles
+//}
+//
+//data class Vehicle(
+//    val id: Int,
+//    val lane: VehicleLane,
+//    val type: VehicleType,
+//    val position: Float,
+//    val speed: Float,
+//    val color: Color
+//)
+//
+//
+//enum class VehicleLane {
+//    EAST_1, EAST_2, EAST_3,  // Left to right movement
+//    WEST_1, WEST_2, WEST_3,  // Right to left movement
+//    SOUTH_1, SOUTH_2, SOUTH_3,  // Top to bottom movement
+//    NORTH_1, NORTH_2, NORTH_3   // Bottom to top movement
+//}
+//
+//enum class VehicleType(val color: Color, val icon: ImageVector) {
+//    CAR(Color(0xFF3B82F6), Icons.Default.DirectionsCar),
+//    TAXI(Color(0xFFFBBF24), Icons.Default.LocalTaxi),
+//    BUS(Color(0xFF059669), Icons.Default.DirectionsBus),
+//    TRUCK(Color(0xFFDC2626), Icons.Default.LocalShipping),
+//    BIKE(Color(0xFF8B5CF6), Icons.Default.DirectionsBike)
+//}
+//
+//private fun generateRandomVehicles(): List<Vehicle> {
+//    return (1..10).map { generateRandomVehicle() }
+//}
+//
+//private fun generateRandomVehicle(): Vehicle {
+//    val lanes = VehicleLane.values()
+//    val types = VehicleType.values()
+//    val selectedType = types.random()
+//
+//    return Vehicle(
+//        id = Random.nextInt(),
+//        lane = lanes.random(),
+//        type = selectedType,
+//        position = Random.nextFloat() * 0.2f,
+//        speed = Random.nextFloat() * 0.015f + 0.008f,
+//        color = selectedType.color
+//    )
+//}
+//
+//private fun updateVehiclePosition(vehicle: Vehicle): Vehicle {
+//    return vehicle.copy(position = vehicle.position + vehicle.speed)
+//}
+//
+//private fun getVehicleScreenPosition(vehicle: Vehicle): Pair<Float, Float> {
+//    val progress = vehicle.position
+//    val roadCenter = 140f // Center of the intersection area
+//    val laneOffset = 27f // Distance between lanes
+//
+//    return when (vehicle.lane) {
+//        // Broadway Eastbound (Left to Right)
+//        VehicleLane.EAST_1 -> Pair(-30f + progress * 400f, roadCenter - laneOffset)
+//        VehicleLane.EAST_2 -> Pair(-30f + progress * 400f, roadCenter)
+//        VehicleLane.EAST_3 -> Pair(-30f + progress * 400f, roadCenter + laneOffset)
+//
+//        // Broadway Westbound (Right to Left)
+//        VehicleLane.WEST_1 -> Pair(370f - progress * 400f, roadCenter + laneOffset + 15f)
+//        VehicleLane.WEST_2 -> Pair(370f - progress * 400f, roadCenter + 15f)
+//        VehicleLane.WEST_3 -> Pair(370f - progress * 400f, roadCenter - laneOffset + 15f)
+//
+//        // 42nd Street Southbound (Top to Bottom)
+//        VehicleLane.SOUTH_1 -> Pair(roadCenter - laneOffset, -30f + progress * 340f)
+//        VehicleLane.SOUTH_2 -> Pair(roadCenter, -30f + progress * 340f)
+//        VehicleLane.SOUTH_3 -> Pair(roadCenter + laneOffset, -30f + progress * 340f)
+//
+//        // 42nd Street Northbound (Bottom to Top)
+//        VehicleLane.NORTH_1 -> Pair(roadCenter + laneOffset + 15f, 310f - progress * 340f)
+//        VehicleLane.NORTH_2 -> Pair(roadCenter + 15f, 310f - progress * 340f)
+//        VehicleLane.NORTH_3 -> Pair(roadCenter - laneOffset + 15f, 310f - progress * 340f)
+//    }
+//}
+//
+//@Composable
+//private fun ModernVehicle(
+//    modifier: Modifier = Modifier,
+//    vehicle: Vehicle
+//) {
+//    Box(modifier = modifier) {
+//        // Vehicle shadow/glow
+//        Box(
+//            modifier = Modifier
+//                .size(14.dp)
+//                .background(
+//                    Brush.radialGradient(
+//                        colors = listOf(
+//                            vehicle.color.copy(alpha = 0.5f),
+//                            Color.Transparent
+//                        ),
+//                        radius = 25f
+//                    ),
+//                    RoundedCornerShape(3.dp)
+//                )
+//        )
+//
+//        // Vehicle body
+//        Box(
+//            modifier = Modifier
+//                .align(Alignment.Center)
+//                .size(10.dp, 6.dp)
+//                .background(
+//                    vehicle.color,
+//                    RoundedCornerShape(2.dp)
+//                ),
+//            contentAlignment = Alignment.Center
+//        ) {
+//            Icon(
+//                vehicle.type.icon,
+//                contentDescription = null,
+//                tint = Color.White,
+//                modifier = Modifier.size(5.dp)
+//            )
+//        }
+//
+//        // Direction indicator based on lane
+//        val directionColor = when (vehicle.lane) {
+//            VehicleLane.EAST_1, VehicleLane.EAST_2, VehicleLane.EAST_3 -> Color(0xFF00FF88)
+//            VehicleLane.WEST_1, VehicleLane.WEST_2, VehicleLane.WEST_3 -> Color(0xFFFF6B6B)
+//            VehicleLane.SOUTH_1, VehicleLane.SOUTH_2, VehicleLane.SOUTH_3 -> Color(0xFF4ECDC4)
+//            VehicleLane.NORTH_1, VehicleLane.NORTH_2, VehicleLane.NORTH_3 -> Color(0xFFFFE66D)
+//        }
+//
+//        Box(
+//            modifier = Modifier
+//                .align(Alignment.TopEnd)
+//                .size(3.dp)
+//                .background(directionColor, CircleShape)
+//        )
+//    }
+//}
+//
+//@Composable
+//private fun BoxScope.TrafficInfoOverlay() {
+//    // Current phase indicator in center
+//    Card(
+//        modifier = Modifier
+//            .align(Alignment.Center)
+//            .size(60.dp),
+//        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+//        shape = RoundedCornerShape(12.dp),
+//        border = BorderStroke(1.dp, Color(0xFF3B82F6).copy(alpha = 0.4f))
+//    ) {
+//        Column(
+//            modifier = Modifier.fillMaxSize(),
+//            horizontalAlignment = Alignment.CenterHorizontally,
+//            verticalArrangement = Arrangement.Center
+//        ) {
+//            Icon(
+//                Icons.Default.Traffic,
+//                contentDescription = null,
+//                tint = Color(0xFF10B981),
+//                modifier = Modifier.size(16.dp)
+//            )
+//            Spacer(modifier = Modifier.height(2.dp))
+//            Text(
+//                "N-S",
+//                color = Color(0xFF10B981),
+//                fontSize = 10.sp,
+//                fontWeight = FontWeight.Bold
+//            )
+//            Text(
+//                "ACTIVE",
+//                color = Color.White,
+//                fontSize = 8.sp
+//            )
+//        }
+//    }
+//}
+//
+//@Composable
+//private fun StatsView() {
+//    LazyColumn(
+//        modifier = Modifier
+//            .fillMaxWidth()
+//            .height(280.dp),
+//        verticalArrangement = Arrangement.spacedBy(12.dp)
+//    ) {
+//        item {
+//            StatCard(
+//                title = "Peak Hour Analysis",
+//                value = "8:00-9:00 AM",
+//                detail = "Highest traffic volume: 2,847 vehicles/hour",
+//                color = Color(0xFFEF4444)
+//            )
+//        }
+//        item {
+//            StatCard(
+//                title = "Average Wait Time",
+//                value = "3.2 minutes",
+//                detail = "Down 15% from last week",
+//                color = Color(0xFF10B981)
+//            )
+//        }
+//        item {
+//            StatCard(
+//                title = "Traffic Efficiency",
+//                value = "87%",
+//                detail = "Optimal signal timing achieved",
+//                color = Color(0xFF3B82F6)
+//            )
+//        }
+//    }
+//}
+//
+//@Composable
+//private fun HistoryView() {
+//    Column(
+//        modifier = Modifier
+//            .fillMaxWidth()
+//            .height(280.dp),
+//        verticalArrangement = Arrangement.spacedBy(8.dp)
+//    ) {
+//        Text(
+//            "Recent Events",
+//            color = Color.White,
+//            fontSize = 14.sp,
+//            fontWeight = FontWeight.Bold
+//        )
+//
+//        LazyColumn(
+//            verticalArrangement = Arrangement.spacedBy(6.dp)
+//        ) {
+//            items(5) { index ->
+//                HistoryItem(
+//                    time = "09:${18-index}:${36-index*6}",
+//                    event = when (index) {
+//                        0 -> "Signal optimization applied"
+//                        1 -> "Heavy traffic detected on Broadway"
+//                        2 -> "Emergency vehicle priority activated"
+//                        3 -> "Pedestrian crossing extended"
+//                        else -> "Normal traffic flow resumed"
+//                    },
+//                    type = when (index) {
+//                        0 -> "SYSTEM"
+//                        1 -> "ALERT"
+//                        2 -> "PRIORITY"
+//                        3 -> "PEDESTRIAN"
+//                        else -> "INFO"
+//                    }
+//                )
+//            }
+//        }
+//    }
+//}
+//
+//@Composable
+//private fun StatCard(
+//    title: String,
+//    value: String,
+//    detail: String,
+//    color: Color
+//) {
+//    Card(
+//        colors = CardDefaults.cardColors(
+//            containerColor = color.copy(alpha = 0.1f)
+//        ),
+//        shape = RoundedCornerShape(12.dp),
+//        border = BorderStroke(1.dp, color.copy(alpha = 0.2f))
+//    ) {
+//        Column(
+//            modifier = Modifier.padding(16.dp)
+//        ) {
+//            Text(
+//                title,
+//                color = color,
+//                fontSize = 11.sp,
+//                fontWeight = FontWeight.Medium
+//            )
+//            Spacer(modifier = Modifier.height(4.dp))
+//            Text(
+//                value,
+//                color = Color.White,
+//                fontSize = 16.sp,
+//                fontWeight = FontWeight.Bold
+//            )
+//            Text(
+//                detail,
+//                color = Color(0xFF9CA3AF),
+//                fontSize = 10.sp
+//            )
+//        }
+//    }
+//}
+//
+//@Composable
+//private fun HistoryItem(
+//    time: String,
+//    event: String,
+//    type: String
+//) {
+//    Row(
+//        modifier = Modifier
+//            .fillMaxWidth()
+//            .background(
+//                Color(0xFF1F2937).copy(alpha = 0.5f),
+//                RoundedCornerShape(8.dp)
+//            )
+//            .padding(12.dp),
+//        verticalAlignment = Alignment.CenterVertically
+//    ) {
+//        Badge(
+//            containerColor = when (type) {
+//                "ALERT" -> Color(0xFFEF4444).copy(alpha = 0.2f)
+//                "PRIORITY" -> Color(0xFFF59E0B).copy(alpha = 0.2f)
+//                "SYSTEM" -> Color(0xFF3B82F6).copy(alpha = 0.2f)
+//                else -> Color(0xFF6B7280).copy(alpha = 0.2f)
+//            },
+//            contentColor = when (type) {
+//                "ALERT" -> Color(0xFFEF4444)
+//                "PRIORITY" -> Color(0xFFF59E0B)
+//                "SYSTEM" -> Color(0xFF3B82F6)
+//                else -> Color(0xFF9CA3AF)
+//            }
+//        ) {
+//            Text(
+//                type,
+//                fontSize = 8.sp,
+//                fontWeight = FontWeight.Bold
+//            )
+//        }
+//
+//        Spacer(modifier = Modifier.width(8.dp))
+//
+//        Column(modifier = Modifier.weight(1f)) {
+//            Text(
+//                event,
+//                color = Color.White,
+//                fontSize = 11.sp,
+//                fontWeight = FontWeight.Medium
+//            )
+//            Text(
+//                time,
+//                color = Color(0xFF6B7280),
+//                fontSize = 9.sp
+//            )
+//        }
+//    }
+//}
+//
+//@Composable
+//private fun QuickMetrics() {
+//    Row(
+//        modifier = Modifier.fillMaxWidth(),
+//        horizontalArrangement = Arrangement.spacedBy(12.dp)
+//    ) {
+//        QuickMetric(
+//            modifier = Modifier.weight(1f),
+//            label = "VEHICLES",
+//            value = "1,247",
+//            trend = "+12%",
+//            color = Color(0xFF00D4FF)
+//        )
+//
+//        QuickMetric(
+//            modifier = Modifier.weight(1f),
+//            label = "WAIT TIME",
+//            value = "3.2m",
+//            trend = "-8%",
+//            color = Color(0xFF10B981)
+//        )
+//
+//        QuickMetric(
+//            modifier = Modifier.weight(1f),
+//            label = "EFFICIENCY",
+//            value = "87%",
+//            trend = "+5%",
+//            color = Color(0xFFFBBF24)
+//        )
+//    }
+//}
+//
+//@Composable
+//private fun QuickMetric(
+//    modifier: Modifier = Modifier,
+//    label: String,
+//    value: String,
+//    trend: String,
+//    color: Color
+//) {
+//    Card(
+//        modifier = modifier,
+//        colors = CardDefaults.cardColors(
+//            containerColor = MaterialTheme.colorScheme.surfaceVariant
+//        ),
+//        shape = RoundedCornerShape(12.dp)
+//    ) {
+//        Column(
+//            modifier = Modifier.padding(12.dp),
+//            horizontalAlignment = Alignment.CenterHorizontally
+//        ) {
+//            Text(
+//                label,
+//                color = Color(0xFF9CA3AF),
+//                fontSize = 9.sp,
+//                fontWeight = FontWeight.Medium,
+//                letterSpacing = 0.5.sp
+//            )
+//
+//            Spacer(modifier = Modifier.height(2.dp))
+//
+//            Text(
+//                value,
+//                color = MaterialTheme.colorScheme.onSurfaceVariant,
+//                fontSize = 16.sp,
+//                fontWeight = FontWeight.Bold
+//            )
+//
+//            Text(
+//                trend,
+//                color = color,
+//                fontSize = 10.sp,
+//                fontWeight = FontWeight.Medium
+//            )
+//        }
+//    }
+//}
+//
+//enum class TrafficPhase {
+//    NS_GREEN, NS_YELLOW, EW_GREEN, EW_YELLOW
+//}
 
 enum class TrafficLightState(val color: Color) {
     RED(Color(0xFFEF4444)),

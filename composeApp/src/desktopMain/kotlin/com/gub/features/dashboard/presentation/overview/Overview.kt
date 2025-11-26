@@ -103,15 +103,15 @@ fun LiveTrafficMetricsCard(modifier: Modifier = Modifier, liveTrafficMatrics: Mo
 
             LiveMetricItem(
                 label = "Total Vehicle Count",
-                value = liveTrafficMatrics.vehicle.count.toString(),
-                change = liveTrafficMatrics.vehicle.difference.toString(),
+                value = (liveTrafficMatrics.vehicle.count * 20).toString().take(4),
+                change = liveTrafficMatrics.vehicle.difference.toString().take(4),
                 positive = liveTrafficMatrics.vehicle.upWards
             )
 //            LiveMetricItem("Average Speed", "29.4 mph", "+1.2 mph improvement", true)
             LiveMetricItem(
                 label = "Congestion Index",
-                value = liveTrafficMatrics.congestion.count.toString(),
-                change = liveTrafficMatrics.congestion.difference.toString(),
+                value = liveTrafficMatrics.congestion.count.toString().take(4),
+                change = liveTrafficMatrics.congestion.difference.toString().take(4),
                 positive = liveTrafficMatrics.congestion.upWards
             )
 

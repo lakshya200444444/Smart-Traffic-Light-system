@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.gub.core.domain.Response
 import com.gub.domain.models.analytics.ModelTrafficVolume
+import com.gub.features.analytics.data.predictTraffic
 import com.gub.features.analytics.domain.model.ChartDataPoint
 import com.gub.features.analytics.viewModel.ViewModelAnalytics
 import java.time.LocalDate
@@ -45,6 +46,8 @@ fun InteractiveTrafficVolumeChartCard(
     val chartData by viewModel.chartData.collectAsState()
     val analyticsMetrics by viewModel.analyticsMetrics.collectAsState()
     val isRefreshing by viewModel.isRefreshing.collectAsState()
+
+    predictTraffic()
 
     Card(
         modifier = modifier.height(380.dp),
@@ -110,7 +113,7 @@ fun InteractiveTrafficVolumeChartCard(
                     ) {
                         MetricItem(
                             label = "Current Volume",
-                            value = "${metrics.data.totalVehicles}",
+                            value = "${metrics.data.totalVehicles * 3}",
                             trend = "+5.2%",
                             color = Color(0xFF4CAF50)
                         )

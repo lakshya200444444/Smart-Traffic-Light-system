@@ -2,6 +2,7 @@ package com.gub.features.monitoring.data.network
 
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.toComposeImageBitmap
+import com.gub.app.Const
 import kotlinx.coroutines.delay
 import org.bytedeco.javacv.FFmpegFrameGrabber
 import org.bytedeco.javacv.Java2DFrameConverter
@@ -18,7 +19,7 @@ import org.jetbrains.skia.Image.Companion.makeFromEncoded
 import java.nio.ByteBuffer
 
 suspend fun sendFrameToPythonSocket(frame: BufferedImage): Pair<ByteArray, String> = withContext(Dispatchers.IO) {
-    val socket = Socket("34.87.172.238", 5001)
+    val socket = Socket(Const.BASE_URL, 5001)
     val out = DataOutputStream(socket.getOutputStream())
     val input = DataInputStream(socket.getInputStream())
 
