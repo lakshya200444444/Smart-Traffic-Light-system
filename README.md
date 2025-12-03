@@ -31,10 +31,23 @@ The Smart Traffic Management System leverages cutting-edge technology to create 
 - **Emergency Override**: Priority green lights for ambulances, fire trucks, and police vehicles
 
 ### 📊 Monitoring & Analytics
+
+<p align="center">
+  <img src="images/monitoring.png" alt="Traffic Monitoring" width="800"/>
+</p>
+
 - **Live Dashboard**: Real-time visualization of traffic conditions
 - **Traffic Statistics**: Historical data analysis and trend reporting
 - **Congestion Heatmaps**: Visual representation of traffic hotspots
 - **Performance Metrics**: System efficiency and improvement tracking
+
+<p align="center">
+  <img src="images/monitoring_2.png" alt="Traffic Monitoring Interface" width="800"/>
+</p>
+
+<p align="center">
+  <img src="images/monitoring_3.png" alt="Real-time Vehicle Detection" width="800"/>
+</p>
 
 ### 🌐 Multi-Platform Support
 - **Mobile Apps** (Android & iOS): Traffic monitoring and alerts for citizens
@@ -43,6 +56,7 @@ The Smart Traffic Management System leverages cutting-edge technology to create 
 - **Web Dashboard**: Browser-based monitoring and configuration
 
 ### 🔔 Smart Notifications
+
 - **Traffic Alerts**: Real-time congestion notifications
 - **Route Suggestions**: Alternative route recommendations
 - **Incident Reports**: Accident and roadblock alerts
@@ -181,12 +195,26 @@ Smart-Traffic-Management-System/
 - Local notifications
 
 ### Desktop Application
+
+<p align="center">
+  <img src="images/dashboard.png" alt="Desktop Dashboard" width="800"/>
+</p>
+
 - Multi-monitor support
 - Advanced analytics dashboards
 - System administration tools
 - Bulk data export/import
 
+<p align="center">
+  <img src="images/analytics.png" alt="Analytics Dashboard" width="800"/>
+</p>
+
+<p align="center">
+  <img src="images/analytics_2.png" alt="Data Export & Reports" width="800"/>
+</p>
+
 ### Server Backend
+
 - RESTful API
 - WebSocket real-time updates
 - Authentication & authorization
@@ -257,6 +285,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **Alims-Repo**
 - GitHub: [@Alims-Repo](https://github.com/Alims-Repo)
+- Email: sourav.0.alim@gmail.com
 
 ---
 
