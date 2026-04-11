@@ -16,6 +16,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.gub.features.dashboard.viewmodel.ViewModelDashboard
+import com.gub.features.dashboard.presentation.components.EmissionsCard
+import com.gub.features.dashboard.presentation.components.PredictionsCard
 import dev.chrisbanes.haze.HazeState
 import dev.chrisbanes.haze.hazeSource
 
@@ -30,6 +32,41 @@ fun UserInsightsDashboardCard(viewModelDashboard: ViewModelDashboard, hazeState:
                 top = top + 8.dp, start = 24.dp, end = 24.dp, bottom = 24.dp
             )
     ) {
+        // Advanced Analytics Section
+        Text(
+            "Advanced Analytics",
+            color = Color.White,
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(bottom = 12.dp)
+        )
+
+        // Emissions Environmental Impact Card
+        EmissionsCard(
+            modifier = Modifier.padding(bottom = 16.dp),
+            co2Saved = 125.5,
+            fuelSaved = 18.3,
+            moneySaved = 22.88,
+            vehiclesOptimized = 427
+        )
+
+        // Traffic Predictions Card
+        PredictionsCard(
+            modifier = Modifier.padding(bottom = 24.dp),
+            predictedCongestionLevel = 0.65,
+            confidence = 0.82,
+            recommendation = "Extend green time by 15 seconds to prevent congestion"
+        )
+
+        // Original Insights Section
+        Text(
+            "Personal Insights - System Status",
+            color = Color.White,
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(bottom = 12.dp)
+        )
+
         Card(
             modifier = Modifier.fillMaxWidth(),
             colors = CardDefaults.cardColors(containerColor = Color(0xFF161B22)),
@@ -44,7 +81,7 @@ fun UserInsightsDashboardCard(viewModelDashboard: ViewModelDashboard, hazeState:
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        "Personal Insights - Alims-Repo",
+                        "System Performance - Real-time Dashboard",
                         color = Color.White,
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold
@@ -54,7 +91,7 @@ fun UserInsightsDashboardCard(viewModelDashboard: ViewModelDashboard, hazeState:
                         colors = CardDefaults.cardColors(containerColor = Color(0xFF1976D2))
                     ) {
                         Text(
-                            "LEVEL 3",
+                            "OPTIMIZED",
                             color = Color.White,
                             fontSize = 8.sp,
                             fontWeight = FontWeight.Bold,

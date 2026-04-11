@@ -154,7 +154,8 @@ fun Monitoring(viewModelMonitoring: ViewModelMonitoring) {
 
     LaunchedEffect(Unit) {
         try {
-            liveFeedManager.streamVideoAndProcess("1.mp4") { frame, count ->
+            val videoPath = "C:\\Users\\Dell\\Desktop\\Smart Traffic light system\\Smart-Traffic-Management-System\\detection\\resources\\1.mp4"
+            liveFeedManager.streamVideoAndProcess(videoPath) { frame, count ->
                 currentFrame = frame
                 vehicleCount = count
             }
@@ -294,20 +295,110 @@ fun TrafficControlPanelCard(modifier: Modifier = Modifier, viewModelMonitoring: 
 
                             Spacer(modifier = Modifier.height(20.dp))
 
-                            Button(
-                                onClick = {
-                                    viewModelMonitoring.enableEmergencyOverride()
-                                },
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = Color(0xFFF44336)
-                                ),
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
+                            if (uiState.value.isEmergency) {
+                                // Show active emergency info
+                                Card(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    colors = CardDefaults.cardColors(
+                                        containerColor = Color(0xFF4CAF50).copy(alpha = 0.1f)
+                                    )
+                                ) {
+                                    Column(
+                                        modifier = Modifier.padding(16.dp)
+                                    ) {
+                                        Text(
+                                            "🚑 EMERGENCY ACTIVE",
+                                            fontWeight = FontWeight.Bold,
+                                            color = Color(0xFF4CAF50),
+                                            fontSize = 16.sp
+                                        )
+                                        Spacer(modifier = Modifier.height(8.dp))
+                                        Text(
+                                            "Direction: ${uiState.value.emergencyDirection?.name ?: "Unknown"}",
+                                            color = MaterialTheme.colorScheme.onSurface
+                                        )
+                                        Text(
+                                            "Green Time: ${uiState.value.timeRemaining}s remaining",
+                                            color = MaterialTheme.colorScheme.onSurface
+                                        )
+                                    }
+                                }
+                                
+                                Spacer(modifier = Modifier.height(20.dp))
+                                
+                                Button(
+                                    onClick = {
+                                        viewModelMonitoring.disableEmergencyOverride()
+                                    },
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = Color(0xFF4CAF50)
+                                    ),
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Text("DEACTIVATE EMERGENCY")
+                                }
+                            } else {
+                                // Show direction selection
                                 Text(
-                                    if (uiState.value.isEmergency)
-                                        "DEACTIVATE OVERRIDE" else
-                                            "ACTIVATE OVERRIDE"
+                                    "Select Emergency Vehicle Direction",
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 14.sp,
+                                    modifier = Modifier.padding(bottom = 12.dp)
                                 )
+                                
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                                ) {
+                                    Button(
+                                        onClick = {
+                                            viewModelMonitoring.enableEmergencyOverride(TrafficPhase.NS_GREEN)
+                                        },
+                                        modifier = Modifier.weight(1f),
+                                        colors = ButtonDefaults.buttonColors(
+                                            containerColor = Color(0xFF2196F3)
+                                        )
+                                    ) {
+                                        Column(
+                                            horizontalAlignment = Alignment.CenterHorizontally
+                                        ) {
+                                            Text("↕", fontSize = 24.sp)
+                                            Text("North-South", fontSize = 12.sp)
+                                        }
+                                    }
+                                    
+                                    Button(
+                                        onClick = {
+                                            viewModelMonitoring.enableEmergencyOverride(TrafficPhase.EW_GREEN)
+                                        },
+                                        modifier = Modifier.weight(1f),
+                                        colors = ButtonDefaults.buttonColors(
+                                            containerColor = Color(0xFF2196F3)
+                                        )
+                                    ) {
+                                        Column(
+                                            horizontalAlignment = Alignment.CenterHorizontally
+                                        ) {
+                                            Text("↔", fontSize = 24.sp)
+                                            Text("East-West", fontSize = 12.sp)
+                                        }
+                                    }
+                                }
+                                
+                                Spacer(modifier = Modifier.height(20.dp))
+                                
+                                Button(
+                                    onClick = {
+                                        // Alternative single button approach
+                                        viewModelMonitoring.enableEmergencyOverride(TrafficPhase.NS_GREEN)
+                                    },
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = Color(0xFFF44336)
+                                    ),
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Text("ACTIVATE EMERGENCY OVERRIDE")
+                                }
                             }
                         }
                     }

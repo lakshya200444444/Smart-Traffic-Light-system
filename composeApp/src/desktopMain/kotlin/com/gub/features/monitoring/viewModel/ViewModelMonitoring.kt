@@ -111,26 +111,36 @@ class ViewModelMonitoring(
         startSignalTimer()
     }
 
-    fun enableEmergencyOverride() {
+    fun enableEmergencyOverride(direction: TrafficPhase) {
         signalTimerJob?.cancel()
         _uiState.update {
             it.copy(
-                isEmergency = it.isEmergency.not()
+                isEmergency = true,
+                emergencyDirection = direction
             )
         }
-        if (_uiState.value.isEmergency) {
-            makeAllRedSignal()
-        } else {
-            resetToAutoMode()
-        }
+        makeEmergencyGreen(direction)
     }
 
-    fun makeAllRedSignal() {
-        signalTimerJob?.cancel()
+    fun disableEmergencyOverride() {
         _uiState.update {
             it.copy(
-                currentPhase = TrafficPhase.ALL_RED,
-                timeRemaining = 60
+                isEmergency = false,
+                emergencyDirection = null
+            )
+        }
+        resetToAutoMode()
+    }
+
+    fun makeEmergencyGreen(direction: TrafficPhase) {
+        signalTimerJob?.cancel()
+        // Extended green (60 seconds) for emergency direction
+        // Other direction automatically gets red
+        _uiState.update {
+            it.copy(
+                currentPhase = direction,
+                timeRemaining = 60,
+                originalGreenTime = 60
             )
         }
         startSignalTimer()
@@ -144,6 +154,7 @@ class ViewModelMonitoring(
 
 data class MonitoringUiState(
     val isEmergency: Boolean = false,
+    val emergencyDirection: TrafficPhase? = null,
     val isLoading: Boolean = true,
     val timeRemaining: Int = 5,
     val originalGreenTime: Int = 5,

@@ -7,7 +7,7 @@ class UseCaseTrafficVolume(
     private val repositoryAnalytics: RepositoryAnalytics
 ) {
 
-    suspend operator fun invoke(type: ModelTrafficVolume.TrafficVolumeType) : ModelTrafficVolume {
+    suspend operator fun invoke(type: String = "weekly") : ModelTrafficVolume {
         return repositoryAnalytics.getTrafficVolume(type)
     }
 }

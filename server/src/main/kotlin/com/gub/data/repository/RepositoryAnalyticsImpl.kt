@@ -66,7 +66,7 @@ class RepositoryAnalyticsImpl(
         }
 
         return ModelTrafficVolume(
-            type = type,
+            type = type.value,  // Convert enum to string
             trafficVolume = groupedCounts
         )
     }

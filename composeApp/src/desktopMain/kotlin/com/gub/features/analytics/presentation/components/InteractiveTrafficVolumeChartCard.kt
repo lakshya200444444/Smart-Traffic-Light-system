@@ -259,17 +259,19 @@ fun ModelTrafficVolume.toChartData(): List<ChartDataPoint> {
 
     return trafficVolume.mapIndexed { index, value ->
         val label = when (type) {
-            ModelTrafficVolume.TrafficVolumeType.HOURLY -> "${index}:00"
-            ModelTrafficVolume.TrafficVolumeType.DAILY -> listOf("Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat").getOrElse(index) { "" }
-            ModelTrafficVolume.TrafficVolumeType.WEEKLY -> "Wk ${index + 1}"
-            ModelTrafficVolume.TrafficVolumeType.MONTHLY -> "D${index + 1}"
+            "hourly" -> "${index}:00"
+            "daily" -> listOf("Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat").getOrElse(index) { "" }
+            "weekly" -> "Wk ${index + 1}"
+            "monthly" -> "D${index + 1}"
+            else -> "$index"
         }
 
         val isPrediction = when (type) {
-            ModelTrafficVolume.TrafficVolumeType.HOURLY -> index > now.hour
-            ModelTrafficVolume.TrafficVolumeType.DAILY -> index > (now.dayOfWeek.value % 7)
-            ModelTrafficVolume.TrafficVolumeType.WEEKLY -> false // Optional: implement your own logic
-            ModelTrafficVolume.TrafficVolumeType.MONTHLY -> index > now.dayOfMonth - 1
+            "hourly" -> index > now.hour
+            "daily" -> index > (now.dayOfWeek.value % 7)
+            "weekly" -> false // Optional: implement your own logic
+            "monthly" -> index > now.dayOfMonth - 1
+            else -> false
         }
 
         ChartDataPoint(

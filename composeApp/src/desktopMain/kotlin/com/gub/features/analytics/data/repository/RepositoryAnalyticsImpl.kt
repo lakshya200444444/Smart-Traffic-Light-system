@@ -8,7 +8,7 @@ class RepositoryAnalyticsImpl(
     private val analyticsApisImpl: AnalyticsApis
 ) : RepositoryAnalytics {
 
-    override suspend fun getTrafficVolume(type: ModelTrafficVolume.TrafficVolumeType): ModelTrafficVolume {
+    override suspend fun getTrafficVolume(type: String): ModelTrafficVolume {
         return analyticsApisImpl.getTrafficVolume(type)
     }
 }

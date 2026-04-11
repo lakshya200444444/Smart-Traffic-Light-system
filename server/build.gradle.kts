@@ -5,6 +5,13 @@ plugins {
     application
 }
 
+kotlin {
+    jvmToolchain(23)
+    compilerOptions {
+        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_23)
+    }
+}
+
 group = "com.gub"
 version = "1.0.0"
 application {

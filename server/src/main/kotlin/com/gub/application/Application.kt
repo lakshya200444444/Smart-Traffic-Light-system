@@ -2,11 +2,13 @@ package com.gub.application
 
 import com.gub.SERVER_PORT
 import com.gub.di.dashboardModule
-import com.gub.routes.analytics
 import com.gub.routes.dashboardRoute
 import com.gub.routes.monitoring
 import com.gub.routes.settings
 import com.gub.routes.system
+import com.gub.presentation.routes.analyticsRoutes
+import com.gub.presentation.routes.incidentRoutes
+import com.gub.presentation.routes.alertRoutes
 import com.gub.utils.InstantSerializer
 import com.gub.utils.json
 import io.ktor.http.ContentType.Application.Json
@@ -48,8 +50,10 @@ fun Application.module() {
         system()
 
         settings()
-        analytics()
+        analyticsRoutes()
         monitoring()
         dashboardRoute()
+        incidentRoutes()
+        alertRoutes()
     }
 }

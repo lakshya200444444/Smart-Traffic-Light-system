@@ -8,16 +8,16 @@ import io.ktor.client.request.parameter
 
 interface AnalyticsApis {
 
-    suspend fun getTrafficVolume(type: ModelTrafficVolume.TrafficVolumeType): ModelTrafficVolume
+    suspend fun getTrafficVolume(type: String = "weekly"): ModelTrafficVolume
 }
 
 class AnalyticsApisImpl(
     private val httpClient: HttpClient
 ) : AnalyticsApis {
 
-    override suspend fun getTrafficVolume(type: ModelTrafficVolume.TrafficVolumeType): ModelTrafficVolume {
+    override suspend fun getTrafficVolume(type: String): ModelTrafficVolume {
         return httpClient.get("/api/analytics/traffic-volume") {
-            parameter("type", type.value) // or type.toString()
+            parameter("type", type)
         }.body()
     }
 }

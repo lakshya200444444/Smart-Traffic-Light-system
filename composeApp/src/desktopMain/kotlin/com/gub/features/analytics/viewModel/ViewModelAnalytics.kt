@@ -155,10 +155,9 @@ class ViewModelAnalytics(
 //                }
 
 
-                print("DATA -> ${useCaseTrafficVolume(ModelTrafficVolume.TrafficVolumeType.WEEKLY)}")
-                _chartData.value = Response.Success(
-                    useCaseTrafficVolume(ModelTrafficVolume.TrafficVolumeType.WEEKLY)
-                )
+                val chartData = useCaseTrafficVolume("weekly")
+                print("DATA -> $chartData")
+                _chartData.value = Response.Success(chartData)
             } catch (e: Exception) {
                 _chartData.value = Response.Error("Failed to load chart data: ${e.message}")
             }

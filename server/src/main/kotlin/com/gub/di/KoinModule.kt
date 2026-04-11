@@ -27,7 +27,6 @@ import com.gub.domain.usecase.settings.UseCaseExportJson
 import com.gub.domain.usecase.settings.UseCaseImportCsv
 import com.gub.domain.usecase.settings.UseCaseImportJson
 import org.koin.dsl.module
-import sun.nio.ch.NativeThread.signal
 
 val dashboardModule = module {
     // Data Access Objects (DAOs)

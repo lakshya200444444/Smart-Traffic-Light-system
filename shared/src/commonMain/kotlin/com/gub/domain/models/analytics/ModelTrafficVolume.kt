@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class ModelTrafficVolume(
-    val type: TrafficVolumeType,
+    val type: String,  // Changed from enum to string for serialization
     val trafficVolume: List<Int>
 ) {
 
