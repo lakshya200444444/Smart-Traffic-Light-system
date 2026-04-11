@@ -281,13 +281,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-## 👥 Authors
 
-**Alims-Repo**
-- GitHub: [@Alims-Repo](https://github.com/Alims-Repo)
-- Email: sourav.0.alim@gmail.com
-
----
 
 ## 🙏 Acknowledgments
 
@@ -302,7 +296,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 For questions, suggestions, or support:
 - Open an issue on GitHub
-- Email: sourav.0.alim@gmail.com
+- Email: lakshya200408@gmail.com
 
 ---
 
