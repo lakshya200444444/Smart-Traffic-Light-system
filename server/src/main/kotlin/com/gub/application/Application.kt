@@ -9,6 +9,8 @@ import com.gub.routes.system
 import com.gub.presentation.routes.analyticsRoutes
 import com.gub.presentation.routes.incidentRoutes
 import com.gub.presentation.routes.alertRoutes
+import com.gub.presentation.routes.directionalSignalRoutes
+import com.gub.data.service.signal.TrafficSignalManagementService
 import com.gub.utils.InstantSerializer
 import com.gub.utils.json
 import io.ktor.http.ContentType.Application.Json
@@ -45,6 +47,9 @@ fun Application.module() {
         json()
     }
 
+    // Initialize signal management service
+    val signalService = TrafficSignalManagementService()
+
     // Configure routing
     routing {
         system()
@@ -55,5 +60,6 @@ fun Application.module() {
         dashboardRoute()
         incidentRoutes()
         alertRoutes()
+        directionalSignalRoutes(signalService)
     }
 }
